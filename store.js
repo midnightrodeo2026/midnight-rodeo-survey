@@ -149,8 +149,11 @@
         if (error) throw new Error(error.message);
       },
       async remove(id) {
-        const { error } = await sb.from("responses").delete().eq("id", id);
-        if (error) throw new Error(error.message);
+        /* Removes only the answer this browser sent (matched by its edit code). */
+        const { data, error } = await sb.rpc("delete_my_response", { p_token: getToken() });
+        if (error) throw new Error(/could not find the function/i.test(error.message || "") ? "removing isn't switched on in the database yet" : error.message);
+        if (!data) throw new Error("only the browser that sent an answer can remove it. Update your answers once from this browser first");
+        try { localStorage.removeItem(myKey); } catch (e) {}
       },
       async signIn(email) {
         try { localStorage.setItem("mr-go-council", "1"); } catch (e) {} const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: location.href.split("#")[0] } });

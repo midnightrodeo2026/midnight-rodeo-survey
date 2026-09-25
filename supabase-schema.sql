@@ -109,3 +109,20 @@ begin
 end $$;
 
 grant execute on function public.save_response(text, text, text, text, text, jsonb) to anon, authenticated;
+
+-- ------------------------------------------------------------------
+-- Riders can remove only their own answer. Nobody can remove anyone else's.
+-- ------------------------------------------------------------------
+drop policy if exists "leaders delete" on public.responses;
+
+create or replace function public.delete_my_response(p_token text) returns boolean
+language plpgsql security definer set search_path = public as $$
+declare n int;
+begin
+  if coalesce(length(p_token), 0) < 16 then return false; end if;
+  delete from responses where edit_token = p_token;
+  get diagnostics n = row_count;
+  return n > 0;
+end $$;
+
+grant execute on function public.delete_my_response(text) to anon, authenticated;

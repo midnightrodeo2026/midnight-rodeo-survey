@@ -495,17 +495,20 @@
   function renderTable() {
     const q = ($("#resp-search").value || "").toLowerCase().trim();
     const rows = responses.filter(r => !q || JSON.stringify(r).toLowerCase().includes(q)).sort((a, b) => String(b.submittedAt).localeCompare(String(a.submittedAt)));
-    $("#resp-table").innerHTML = `<thead><tr><th>Character</th><th>Discord</th><th>Main</th><th>Role</th><th>Commit</th><th>Flex</th><th>Off-spec</th><th>Roster</th><th>Days</th><th>Window (server)</th><th>Professions</th><th>Notes</th><th class="lead-only"></th></tr></thead><tbody>` +
+    $("#resp-table").innerHTML = `<thead><tr><th>Character</th><th>Discord</th><th>Main</th><th>Role</th><th>Commit</th><th>Flex</th><th>Off-spec</th><th>Roster</th><th>Days</th><th>Window (server)</th><th>Professions</th><th>Notes</th><th><span class="sr">Actions</span></th></tr></thead><tbody>` +
       (rows.map(r => {
         const c = clsBy(r.main && r.main.cls) || { color: "#ccc" };
-        return `<tr><td class="cc" style="--cc:${c.color}">${esc(r.character)}${r.demo ? ' <span class="muted">(sample)</span>' : ""}</td><td>${esc(r.discord)}</td><td>${esc(specName(r.main.cls, r.main.spec))}</td><td>${esc(r.role)}</td><td>${esc(labelOf(C.commitment, r.commitment))}</td><td>${r.flex && r.flex.cls ? esc(specName(r.flex.cls, r.flex.spec)) : "—"}</td><td>${esc(labelOf(C.offspec, r.offspec).split(",")[0])}</td><td>${esc(labelOf(C.rosterPrefs, r.roster))}</td><td>${esc((r.days || []).join(" "))}</td><td style="white-space:nowrap">${esc(srvTime(r, r.start))}–${esc(srvTime(r, r.end))}</td><td>${esc((r.professions || []).join(" + "))}</td><td style="min-width:180px">${esc(r.notes)}</td><td class="lead-only"><button class="linkbtn" data-del="${esc(r.id)}" data-name="${esc(r.character)}">Remove</button></td></tr>`;
+        return `<tr><td class="cc" style="--cc:${c.color}">${esc(r.character)}${r.demo ? ' <span class="muted">(sample)</span>' : ""}</td><td>${esc(r.discord)}</td><td>${esc(specName(r.main.cls, r.main.spec))}</td><td>${esc(r.role)}</td><td>${esc(labelOf(C.commitment, r.commitment))}</td><td>${r.flex && r.flex.cls ? esc(specName(r.flex.cls, r.flex.spec)) : "—"}</td><td>${esc(labelOf(C.offspec, r.offspec).split(",")[0])}</td><td>${esc(labelOf(C.rosterPrefs, r.roster))}</td><td>${esc((r.days || []).join(" "))}</td><td style="white-space:nowrap">${esc(srvTime(r, r.start))}–${esc(srvTime(r, r.end))}</td><td>${esc((r.professions || []).join(" + "))}</td><td style="min-width:180px">${esc(r.notes)}</td><td>${isMine(r) ? `<button class="linkbtn" data-del="${esc(r.id)}" data-name="${esc(r.character)}">Remove me</button>` : ""}</td></tr>`;
       }).join("") || `<tr><td colspan="13" class="muted">No matching responses.</td></tr>`) + `</tbody>`;
   }
+  /* Only your own answer (the one this browser sent) can be removed. */
+  function isMine(r) { return !!(mine && r && mine.character && r.character && mine.character.trim().toLowerCase() === r.character.trim().toLowerCase()); }
   $("#resp-search").addEventListener("input", renderTable);
   document.addEventListener("click", async e => {
-    const b = e.target.closest("[data-del]"); if (!b || !store || !store.canLead) return;
-    if (b.dataset.confirm !== "1") { b.dataset.confirm = "1"; b.textContent = "Confirm remove"; setTimeout(() => { if (b.isConnected) { b.dataset.confirm = ""; b.textContent = "Remove"; } }, 4000); return; }
-    try { await store.remove(b.dataset.del); toast(`Removed ${b.dataset.name}.`); } catch (err) { toast("Couldn't remove: " + err.message); }
+    const b = e.target.closest("[data-del]"); if (!b || !store) return;
+    if (!isMine(responses.find(x => x.id === b.dataset.del))) return;
+    if (b.dataset.confirm !== "1") { b.dataset.confirm = "1"; b.textContent = "Confirm remove"; setTimeout(() => { if (b.isConnected) { b.dataset.confirm = ""; b.textContent = "Remove me"; } }, 4000); return; }
+    try { await store.remove(b.dataset.del); mine = null; renderMe(); toast(`Removed ${b.dataset.name} from the board.`); } catch (err) { toast("Couldn't remove: " + err.message); }
   });
 
   function fillTargetsForm() {
