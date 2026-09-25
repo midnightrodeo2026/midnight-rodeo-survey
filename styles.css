@@ -141,8 +141,8 @@ a { color: var(--gold-hi); }
 .cls-chip.zero { opacity: .55; }
 
 .riders { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; }
-.riders li { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border: 1px solid var(--line); border-radius: var(--r); background: rgba(11,8,8,.35); min-width: 0; }
-.riders .dot { width: 10px; height: 10px; border-radius: 2px; transform: rotate(45deg); background: var(--cc); flex: none; }
+.riders li { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border: 1px solid var(--line); border-left: 3px solid var(--cc); border-radius: var(--r); background: rgba(11,8,8,.35); min-width: 0; }
+.riders .dot { display: none; }
 .riders .who { min-width: 0; }
 .riders .who b { display: block; color: var(--bone); font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .riders .who span { display: block; font: 500 13px/1.2 var(--f-ui); letter-spacing: .06em; color: var(--muted); }
@@ -355,7 +355,8 @@ td.cc { color: var(--cc); font-weight: 700; }
 /* ---------- Review fixes: class icons, field alignment, open roster ---------- */
 .field { align-content: start; }
 .ci { width: 18px; height: 18px; flex: none; color: var(--cc, var(--gold)); }
-.cls-chip .ci { width: 20px; height: 20px; }
+.cls-chip .ci { width: 36px; height: 36px; object-fit: contain; border-radius: 4px; }
+.rider-cls-img { width: 36px; height: 36px; object-fit: contain; flex: none; border-radius: 4px; }
 .tile.cls > span .ico { gap: 8px; }
 .tile.cls > span svg.ci { color: var(--cc); width: 20px; height: 20px; }
 .hbar .t .ci { width: 14px; height: 14px; vertical-align: -2px; margin-right: 6px; }
@@ -413,9 +414,9 @@ canvas.smoke { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0;
 @media (max-width: 600px) { .topbar { grid-template-columns: 1fr auto; } .topbar .nav { grid-column: auto; grid-row: auto; } }
 
 /* ---------- Guild axe badge on Saddle Up ---------- */
-.start .seal.axe-seal { width: 72px; height: 72px; padding: 0; overflow: hidden; background: #0b0808; border: 2px solid var(--gold); }
-.start .seal.axe-seal img { width: 100%; height: 100%; object-fit: cover; display: block; transform: scale(1.06); }
-@media (max-width: 600px) { .start .seal.axe-seal { width: 60px; height: 60px; } }
+.start .seal.axe-seal { width: 96px; height: 96px; padding: 0; overflow: hidden; background: transparent; border: none; box-shadow: none; border-radius: 0; }
+.start .seal.axe-seal img { width: 100%; height: 100%; object-fit: contain; display: block; filter: drop-shadow(0 2px 8px rgba(0,0,0,.8)); }
+@media (max-width: 600px) { .start .seal.axe-seal { width: 76px; height: 76px; } }
 
 /* ---------- Council layout ---------- */
 .council { gap: 18px; }
@@ -454,3 +455,44 @@ canvas.smoke { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0;
 .rtile span { grid-column: 2; grid-row: 2; }
 .rtile small { grid-column: 3; grid-row: 1 / 3; margin: 0; align-self: center; font-size: 15px; }
 .c-grid.three .hbar { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) 26px; font-size: 13px; letter-spacing: .04em; }
+
+/* ---------- Class art polish ---------- */
+.classes { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
+.cls-chip { position: relative; gap: 10px; padding: 6px 12px 6px 6px; border: 1px solid var(--line); border-left: 2px solid var(--cc); overflow: hidden;
+  background: radial-gradient(80px 70px at 32px 50%, color-mix(in srgb, var(--cc) 22%, transparent), transparent 70%), linear-gradient(180deg, #1a1212, #110b0b);
+  transition: border-color .2s, transform .15s; }
+.cls-chip:hover { border-color: color-mix(in srgb, var(--cc) 55%, var(--line)); transform: translateY(-1px); }
+.cls-chip .ci { width: 50px; height: 50px; flex: none; object-fit: contain; border-radius: 0; filter: drop-shadow(0 0 8px color-mix(in srgb, var(--cc) 45%, transparent)) drop-shadow(0 3px 4px rgba(0,0,0,.8)); }
+.cls-chip .n { font: 600 14px/1 var(--f-ui); letter-spacing: .05em; white-space: nowrap; text-shadow: 0 1px 0 #000; }
+.cls-chip .v { font: 700 24px/1 var(--f-ui); color: var(--bone); min-width: 1.4ch; text-align: right; }
+.cls-chip.zero { opacity: 1; }
+.cls-chip.zero .ci { filter: grayscale(.85) brightness(.7); }
+.cls-chip.zero .n, .cls-chip.zero .v { opacity: .5; }
+
+.riders li { gap: 12px; padding: 6px 12px 6px 6px; background: radial-gradient(60px 50px at 26px 50%, color-mix(in srgb, var(--cc) 18%, transparent), transparent 70%), rgba(11,8,8,.45); border-left: 2px solid var(--cc); }
+.rider-cls-img { width: 44px; height: 44px; object-fit: contain; border-radius: 0; filter: drop-shadow(0 0 6px color-mix(in srgb, var(--cc) 40%, transparent)) drop-shadow(0 2px 3px rgba(0,0,0,.8)); }
+.riders .who span { color: color-mix(in srgb, var(--cc) 60%, var(--muted)); }
+
+.tiles:has(.tile.cls) { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+.tile.cls > span { border-left-width: 2px; padding: 8px 10px; min-height: 64px; background: radial-gradient(60px 50px at 30px 50%, color-mix(in srgb, var(--cc) 14%, transparent), transparent 70%), #120d0d; }
+.tile.cls > span .ico { gap: 10px; }
+.tile.cls > span img.ci { width: 46px; height: 46px; object-fit: contain; filter: drop-shadow(0 0 6px color-mix(in srgb, var(--cc) 40%, transparent)) drop-shadow(0 2px 3px rgba(0,0,0,.8)); transition: transform .2s; }
+.tile.cls input:checked + span { background: radial-gradient(70px 60px at 30px 50%, color-mix(in srgb, var(--cc) 30%, transparent), transparent 70%), linear-gradient(180deg, rgba(163,20,28,.28), rgba(163,20,28,.08)); }
+.tile.cls input:checked + span img.ci { transform: scale(1.08); }
+
+/* Saddle Up medallion */
+.start { padding: 6px 30px 6px 6px; gap: 18px; }
+.start .seal.axe-seal { width: 84px; height: 84px; border-radius: 50%; overflow: visible; animation: none; background: transparent; border: 0; box-shadow: none; }
+.start .seal.axe-seal img { border-radius: 0; object-fit: contain; filter: drop-shadow(0 0 10px rgba(212,42,47,.35)) drop-shadow(0 4px 8px rgba(0,0,0,.85)); transition: transform .35s ease; }
+.start:hover .seal.axe-seal img { transform: rotate(-8deg) scale(1.05); }
+@media (prefers-reduced-motion: no-preference) {
+  .start .seal.axe-seal img { animation: saddle-glow 3.4s ease-in-out infinite; }
+  @keyframes saddle-glow { 0%,100% { filter: drop-shadow(0 0 6px rgba(212,42,47,.25)) drop-shadow(0 4px 8px rgba(0,0,0,.85)); } 50% { filter: drop-shadow(0 0 16px rgba(212,42,47,.55)) drop-shadow(0 4px 8px rgba(0,0,0,.85)); } }
+}
+@media (max-width: 600px) { .start .seal.axe-seal { width: 70px; height: 70px; } .start { padding-right: 18px; } }
+
+/* ---------- War Room: leader-only controls ---------- */
+body:not(.is-lead) .lead-only { display: none; }
+#council-locked:not([hidden]) + #council-body:not([hidden]) { margin-top: -10px; }
+#council-locked.inline { padding: 18px 0 0; min-height: 0; text-align: left; }
+#council-locked.inline .eyebrow, #council-locked.inline h1 { display: none; }

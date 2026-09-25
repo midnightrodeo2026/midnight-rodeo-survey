@@ -32,9 +32,11 @@ alter table public.config    enable row level security;
 
 drop policy if exists "anyone can submit"      on public.responses;
 drop policy if exists "leaders read responses" on public.responses;
+drop policy if exists "anyone reads responses" on public.responses;
 drop policy if exists "leaders delete"         on public.responses;
 create policy "anyone can submit"      on public.responses for insert to anon, authenticated with check (true);
-create policy "leaders read responses" on public.responses for select to authenticated using (public.is_leader());
+-- War Room is public: everyone can read all answers
+create policy "anyone reads responses" on public.responses for select to anon, authenticated using (true);
 create policy "leaders delete"         on public.responses for delete to authenticated using (public.is_leader());
 
 drop policy if exists "read config"   on public.config;

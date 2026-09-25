@@ -7,6 +7,7 @@
 <meta name="description" content="Pre-launch roster survey for the Horde guild Midnight Rodeo in WoW Forever.">
 <meta name="theme-color" content="#0b0808">
 <link rel="icon" href="logo-sm.webp" type="image/webp">
+<link rel="apple-touch-icon" href="icon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Barlow+Condensed:wght@500;600;700&family=Grenze+Gotisch:wght@600;700;800&family=Metal+Mania&display=swap">
@@ -43,7 +44,7 @@
     <nav class="nav" aria-label="Main">
       <a href="#home" data-nav="home">The Board</a>
       <a href="#survey" data-nav="survey">Survey</a>
-      <a href="#council" data-nav="council" id="nav-council" hidden>Council</a>
+      <a href="#council" data-nav="council" id="nav-council" hidden>War Room</a>
     </nav>
     <div class="top-right">
       <span class="mode-pill" id="mode-pill">Connecting…</span>
@@ -61,7 +62,7 @@
         <p class="lede">Tell leadership what you plan to ride at launch. Your answers help us balance tanks, healers and damage across the raid team before day one. <strong>Nothing here locks you in.</strong> You can change your answers any time, and nobody gets forced onto a class.</p>
         <div class="hero-cta">
           <a class="start" href="#survey" id="start-btn">
-            <span class="seal axe-seal" aria-hidden="true"><img src="saddle.webp" alt="" width="64" height="64"></span>
+            <span class="seal axe-seal" aria-hidden="true"><img src="saddle-horde.webp" alt="" width="96" height="96"></span>
             <span><b id="start-label" class="logo-text">Saddle Up</b><small id="start-sub">Start the survey · about 4 minutes</small></span>
           </a>
           <p class="me-note" id="me-note" hidden></p>
@@ -97,7 +98,7 @@
 
       <div class="how">
         <div><b>Fill it out once</b><p>Main, flex pick, schedule and professions. Takes a few minutes.</p></div>
-        <div><b>Leadership balances</b><p>The council sees class, role and schedule gaps and plans the launch roster around them.</p></div>
+        <div><b>Open War Room</b><p>Everyone can see class, role and schedule gaps in the War Room while leadership plans the launch roster.</p></div>
         <div><b>Change your mind</b><p>Come back and resubmit whenever your plans change. Your latest answer counts.</p></div>
       </div>
     </section>
@@ -117,7 +118,7 @@
       <form id="survey-form" class="card" novalidate>
         <!-- 1 -->
         <section data-step="0" aria-labelledby="s0h">
-          <div class="card-head"><p class="eyebrow">Section 1 of 7</p><h2 id="s0h" class="logo-text">Who's <span>riding?</span></h2><p>So leadership can match your answers to you in game and on Discord.</p></div>
+          <div class="card-head"><p class="eyebrow">Section 1 of 7</p><h2 id="s0h" class="logo-text">Who's <span>riding?</span></h2><p>So leadership can match your answers to you in game and on Discord. <strong>All answers, including your Discord name and notes, are visible to everyone in the War Room.</strong></p></div>
           <div class="fields grid2">
             <div class="field">
               <label for="f-character">Character / main name<span class="req" aria-hidden="true">*</span></label>
@@ -178,29 +179,23 @@
 
         <!-- 5 -->
         <section data-step="4" aria-labelledby="s4h" hidden>
-          <div class="card-head"><p class="eyebrow">Section 5 of 7</p><h2 id="s4h" class="logo-text">When you <span>ride</span></h2><p>Your usual play window in your own timezone. Leadership converts everything to server time.</p></div>
+          <div class="card-head"><p class="eyebrow">Section 5 of 7</p><h2 id="s4h" class="logo-text">When you <span>ride</span></h2><p>Your usual play window, using the server clock: <strong class="srv-label">server time</strong>.</p></div>
           <div class="fields">
-            <div class="field">
-              <label for="f-tz">Your timezone<span class="req" aria-hidden="true">*</span></label>
-              <select id="f-tz" name="tz" aria-describedby="e-tz"></select>
-              <p class="error" id="e-tz" aria-live="polite"></p>
-            </div>
             <fieldset class="field"><legend>Available days<span class="req" aria-hidden="true">*</span></legend>
               <div class="tiles days" id="day-tiles"></div><p class="error" id="e-days" aria-live="polite"></p></fieldset>
             <div class="grid2">
               <div class="field">
-                <label for="f-start">Typical start time<span class="req" aria-hidden="true">*</span></label>
+                <label for="f-start">Start (server time)<span class="req" aria-hidden="true">*</span></label>
                 <input type="time" id="f-start" name="start" step="900" aria-describedby="e-start">
                 <p class="error" id="e-start" aria-live="polite"></p>
               </div>
               <div class="field">
-                <label for="f-end">Typical end time<span class="req" aria-hidden="true">*</span></label>
+                <label for="f-end">End (server time)<span class="req" aria-hidden="true">*</span></label>
                 <input type="time" id="f-end" name="end" step="900" aria-describedby="e-end h-end">
                 <p class="help" id="h-end">Past midnight is fine (e.g. 19:00 to 01:00).</p>
                 <p class="error" id="e-end" aria-live="polite"></p>
               </div>
             </div>
-            <p class="inline-note" id="tz-note" hidden></p>
           </div>
         </section>
 
@@ -223,7 +218,7 @@
             <fieldset class="field"><legend>Would you change professions for guild needs?<span class="req" aria-hidden="true">*</span></legend>
               <div class="tiles wide" id="profchange-tiles"></div><p class="error" id="e-profChange" aria-live="polite"></p></fieldset>
             <div class="field">
-              <label for="f-notes">Notes for leadership</label>
+              <label for="f-notes">Notes for leadership <span class="muted">(visible to everyone)</span></label>
               <textarea id="f-notes" name="notes" maxlength="600" placeholder="Anything else: alts, schedule changes, friends joining, who you want to raid with…" aria-describedby="notes-count"></textarea>
               <p class="counter" id="notes-count">0 / 600</p>
             </div>
@@ -250,7 +245,7 @@
     <section class="done" aria-labelledby="done-title">
       <div class="stamp"><img src="logo.webp" alt="" width="640" height="640"></div>
       <h1 id="done-title" tabindex="-1">YOU'RE ON <span>THE BOARD.</span></h1>
-      <p class="lede muted" style="max-width:52ch">Leadership has your answers. Nothing is locked in. If your plans change, come back and update them any time before launch.</p>
+      <p class="lede muted" style="max-width:52ch">Your answers are in the War Room. Nothing is locked in. If your plans change, come back and update them any time before launch.</p>
       <div class="ticket" id="ticket"></div>
       <div class="hero-cta" style="justify-content:center">
         <a class="btn primary" href="#home">See the board</a>
@@ -262,8 +257,8 @@
   <!-- ================= COUNCIL ================= -->
   <main id="view-council" data-view="council" hidden>
     <div id="council-locked" class="locked" hidden>
-      <p class="eyebrow">Leadership only</p>
-      <h1 class="logo-text">The <span>Council</span></h1>
+      <p class="eyebrow">Open to all riders</p>
+      <h1 class="logo-text">The War <span>Room</span></h1>
       <p class="muted" id="locked-text">Only guild leadership can see full responses.</p>
       <form id="login-form" class="toolbar" hidden>
         <label class="sr" for="login-email">Leadership email</label>
@@ -273,13 +268,14 @@
     </div>
     <div id="council-body" class="council" hidden>
       <div class="council-head">
-        <div><p class="eyebrow">Leadership only</p><h1 class="logo-text">The <span>Council</span></h1></div>
+        <div><p class="eyebrow">Open to all riders</p><h1 class="logo-text">The War <span>Room</span></h1></div>
         <div class="toolbar">
+          <button class="btn small ghost" id="btn-lead-login" type="button" hidden>Leader sign-in</button>
           <button class="btn small" id="btn-csv" type="button">Export CSV</button>
           <button class="btn small ghost" id="btn-reset-demo" type="button" hidden>Reset demo data</button>
         </div>
       </div>
-      <nav class="council-jump" aria-label="Council sections">
+      <nav class="council-jump" aria-label="War Room sections">
         <a href="#c-roster">Roster</a><a href="#c-schedule">Schedule</a><a href="#c-players">Players</a><a href="#c-crafting">Professions</a><a href="#c-responses">Responses</a>
       </nav>
       <div class="kpis" id="kpis"></div>
@@ -295,7 +291,7 @@
 
       <section class="c-sec" id="c-schedule" aria-labelledby="c-schedule-h">
         <div class="section-title"><h3 id="c-schedule-h" class="logo-text">When they <span>ride</span></h3></div>
-        <div class="panel"><h3>Availability <label class="legend" for="ref-tz">Shown in <select id="ref-tz" style="min-height:34px;width:auto;padding:4px 36px 4px 10px;font-size:14px"></select></label></h3><div class="scroll"><div class="heat" id="heat"></div></div><p class="help" style="margin-top:10px">Darker red = more riders online in that hour. Hover a cell for the exact count.</p></div>
+        <div class="panel"><h3>Availability <span class="legend">Shown in <span class="srv-label">server time</span></span></h3><div class="scroll"><div class="heat" id="heat"></div></div><p class="help" style="margin-top:10px">Darker red = more riders online in that hour. Hover a cell for the exact count.</p></div>
       </section>
 
       <section class="c-sec" id="c-players" aria-labelledby="c-players-h">

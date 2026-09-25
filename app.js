@@ -37,9 +37,9 @@
   /* ------------------------------------------------------------------ */
   const STEPS = ["Rider", "Main", "Flex pick", "Playstyle", "Schedule", "Professions", "Review"];
   const DRAFT = "mr-survey-draft";
-  const blank = () => ({ character: "", discord: "", mainCls: "", mainSpec: "", role: "", commitment: "", flexCls: "", flexSpec: "", offspec: "", interests: [], roster: "", tz: guessTz(), days: [], start: "", end: "", prof1: "", prof2: "", profChange: "", notes: "" });
+  const blank = () => ({ character: "", discord: "", mainCls: "", mainSpec: "", role: "", commitment: "", flexCls: "", flexSpec: "", offspec: "", interests: [], roster: "", tz: C.serverTimezone, days: [], start: "", end: "", prof1: "", prof2: "", profChange: "", notes: "" });
   const state = { step: 0, visited: 0, v: blank(), errs: {} };
-  try { const d = JSON.parse(localStorage.getItem(DRAFT) || "null"); if (d && d.v) { Object.assign(state.v, d.v); state.visited = d.visited || 0; } } catch (e) {}
+  try { const d = JSON.parse(localStorage.getItem(DRAFT) || "null"); if (d && d.v) { Object.assign(state.v, d.v); state.v.tz = C.serverTimezone; state.visited = d.visited || 0; } } catch (e) {}
   const saveDraft = () => { try { localStorage.setItem(DRAFT, JSON.stringify({ v: state.v, visited: state.visited })); } catch (e) {} };
 
   function guessTz() {
@@ -55,7 +55,9 @@
     } catch (e) { return 0; }
   }
   const fmtOffset = m => "UTC" + (m >= 0 ? "+" : "−") + Math.floor(Math.abs(m) / 60) + (Math.abs(m) % 60 ? ":" + String(Math.abs(m) % 60).padStart(2, "0") : "");
-  const tzLabel = tz => { const f = C.timezones.find(t => t[0] === tz); return (f ? f[1] : tz) + " · " + fmtOffset(tzOffsetMin(tz)); };
+  const hm = x => String(Math.floor(x / 60)).padStart(2, "0") + ":" + String(x % 60).padStart(2, "0");
+  /* Old answers may be in a rider's own timezone; show everything in server time. */
+  const srvTime = (r, t) => { if (!t) return ""; const off = r.tz ? tzOffsetMin(r.tz) : (r.tzOffsetMin || 0), shift = tzOffsetMin(C.serverTimezone) - off; const [h, m] = t.split(":").map(Number); return hm((((h * 60 + m + shift) % 1440) + 1440) % 1440); };
 
   /* ------------------------------------------------------------------ */
   /* Build controls                                                      */
@@ -65,7 +67,7 @@
     return `<label class="tile ${extra}" for="${id}"><input type="${type}" id="${id}" name="${name}" value="${esc(value)}"><span>${inner}</span></label>`;
   }
   function buildStatic() {
-    $("#main-cls").innerHTML = classes.map(c => tile("radio", "mainCls", c.key, `<span class="ico"><svg class="ci" aria-hidden="true"><use href="#c-${c.key}"/></svg>${esc(c.name)}</span>`, "cls").replace('class="tile cls"', `class="tile cls" style="--cc:${c.color}"`)).join("");
+    $("#main-cls").innerHTML = classes.map(c => tile("radio", "mainCls", c.key, `<span class="ico"><img class="ci" src="${c.key}.webp" alt="" aria-hidden="true" onerror="this.style.display='none'">${esc(c.name)}</span>`, "cls").replace('class="tile cls"', `class="tile cls" style="--cc:${c.color}"`)).join("");
     $("#role-tiles").innerHTML = C.roles.map(r => tile("radio", "role", r, `<span class="ico"><svg aria-hidden="true"><use href="#${roleIcon(r)}"/></svg>${esc(r)}</span>`)).join("");
     $("#commit-tiles").innerHTML = C.commitment.map(o => tile("radio", "commitment", o.key, `${esc(o.label)}<small>${esc(o.hint)}</small>`)).join("");
     $("#f-flexCls").innerHTML = `<option value="">No flex pick</option>` + classes.map(c => `<option value="${c.key}">${esc(c.name)}</option>`).join("");
@@ -73,13 +75,10 @@
     $("#interest-tiles").innerHTML = C.interests.map(i => tile("checkbox", "interests", i, esc(i))).join("");
     $("#roster-tiles").innerHTML = C.rosterPrefs.map(o => tile("radio", "roster", o.key, `${esc(o.label)}<small>${esc(o.hint)}</small>`)).join("");
     $("#day-tiles").innerHTML = C.days.map((d, i) => tile("checkbox", "days", d, `<span aria-hidden="true">${d}</span><span class="sr">${C.dayNames[i]}</span>`)).join("");
-    const tzs = C.timezones.slice(); const g = guessTz();
-    if (g && !tzs.find(t => t[0] === g)) tzs.unshift([g, g.replace(/_/g, " ")]);
-    $("#f-tz").innerHTML = `<option value="">Choose your timezone</option>` + tzs.map(t => `<option value="${t[0]}">${esc(t[1])} · ${fmtOffset(tzOffsetMin(t[0]))}</option>`).join("");
+    $$(".srv-label").forEach(el => el.textContent = C.serverTimezoneLabel);
     const profOpts = `<option value="">Choose a profession</option>` + C.professions.map(p => `<option>${esc(p)}</option>`).join("");
     $("#f-prof1").innerHTML = profOpts; $("#f-prof2").innerHTML = profOpts;
     $("#profchange-tiles").innerHTML = C.profChange.map(o => tile("radio", "profChange", o.key, esc(o.label))).join("");
-    $("#ref-tz").innerHTML = [[C.serverTimezone, C.serverTimezoneLabel]].concat(C.timezones.filter(t => t[0] !== C.serverTimezone)).map(t => `<option value="${t[0]}">${esc(t[1])}</option>`).join("");
     $("#step-list").innerHTML = STEPS.map((s, i) => `<li><button type="button" data-go="${i}"><span class="k num">${i + 1}</span><span class="t">${s}</span></button></li>`).join("");
   }
   function buildSpecs(target, name, clsKey, selected) {
@@ -108,13 +107,11 @@
     setRadio("offspec", v.offspec);
     $$('input[name="interests"]').forEach(i => i.checked = v.interests.includes(i.value));
     setRadio("roster", v.roster);
-    $("#f-tz").value = v.tz || "";
     $$('input[name="days"]').forEach(i => i.checked = v.days.includes(i.value));
     $("#f-start").value = v.start; $("#f-end").value = v.end;
     $("#f-prof1").value = v.prof1; $("#f-prof2").value = v.prof2;
     setRadio("profChange", v.profChange);
     $("#f-notes").value = v.notes; $("#notes-count").textContent = v.notes.length + " / 600";
-    tzNote();
   }
   function setRadio(name, val) { $$(`input[name="${name}"]`).forEach(i => i.checked = i.value === val); }
 
@@ -133,17 +130,8 @@
       if (t.name === "flexCls") { v.flexSpec = ""; $("#flex-spec-field").hidden = !v.flexCls; buildSpecs("#flex-spec", "flexSpec", v.flexCls, ""); }
       if (t.name === "notes") $("#notes-count").textContent = t.value.length + " / 600";
     }
-    if (["tz", "start", "end"].includes(t.name)) tzNote();
     if (state.errs[t.name] || (t.name === "mainCls" && state.errs.mainSpec)) validateStep(state.step, true);
     saveDraft(); updateProgress();
-  }
-  function tzNote() {
-    const n = $("#tz-note"), v = state.v;
-    if (!v.tz || !v.start || !v.end) { n.hidden = true; return; }
-    const shift = tzOffsetMin(C.serverTimezone) - tzOffsetMin(v.tz);
-    const conv = t => { let [h, m] = t.split(":").map(Number); let x = ((h * 60 + m + shift) % 1440 + 1440) % 1440; return String(Math.floor(x / 60)).padStart(2, "0") + ":" + String(x % 60).padStart(2, "0"); };
-    n.innerHTML = `That's <b>${conv(v.start)} to ${conv(v.end)}</b> in ${esc(C.serverTimezoneLabel)}.`;
-    n.hidden = false;
   }
 
   /* ------------------------------------------------------------------ */
@@ -176,7 +164,6 @@
       if (!v.roster) e.roster = "Pick where you see yourself on the roster.";
     }
     if (i === 4) {
-      if (!v.tz) e.tz = "Choose your timezone.";
       if (!v.days.length) e.days = "Pick at least one day you can play.";
       if (!v.start) e.start = "Enter the time you usually log on.";
       if (!v.end) e.end = "Enter the time you usually log off.";
@@ -190,10 +177,10 @@
     }
     return e;
   }
-  const FIELD_EL = { character: "#f-character", discord: "#f-discord", tz: "#f-tz", start: "#f-start", end: "#f-end", prof1: "#f-prof1", prof2: "#f-prof2" };
+  const FIELD_EL = { character: "#f-character", discord: "#f-discord", start: "#f-start", end: "#f-end", prof1: "#f-prof1", prof2: "#f-prof2" };
   function validateStep(i, quiet) {
     const e = stepErrors(i);
-    const keys = { 0: ["character", "discord"], 1: ["mainCls", "mainSpec", "role", "commitment"], 2: ["flexSpec", "offspec"], 3: ["interests", "roster"], 4: ["tz", "days", "start", "end"], 5: ["prof1", "prof2", "profChange"] }[i] || [];
+    const keys = { 0: ["character", "discord"], 1: ["mainCls", "mainSpec", "role", "commitment"], 2: ["flexSpec", "offspec"], 3: ["interests", "roster"], 4: ["days", "start", "end"], 5: ["prof1", "prof2", "profChange"] }[i] || [];
     keys.forEach(k => {
       const box = $("#e-" + k); if (box) box.textContent = e[k] || "";
       if (FIELD_EL[k]) $(FIELD_EL[k]).setAttribute("aria-invalid", e[k] ? "true" : "false");
@@ -269,7 +256,7 @@
       flex: { cls: v.flexCls || "", spec: v.flexSpec || "", role: flexSpec ? flexSpec.roles[0] : "" },
       offspec: v.offspec,
       interests: v.interests.slice(), roster: v.roster,
-      tz: v.tz, tzOffsetMin: tzOffsetMin(v.tz),
+      tz: C.serverTimezone, tzOffsetMin: tzOffsetMin(C.serverTimezone),
       days: C.days.filter(d => v.days.includes(d)),
       start: v.start, end: v.end,
       professions: [v.prof1, v.prof2], profChange: v.profChange,
@@ -280,7 +267,7 @@
     return {
       character: r.character || "", discord: r.discord || "", mainCls: r.main?.cls || "", mainSpec: r.main?.spec || "", role: r.role || "", commitment: r.commitment || "",
       flexCls: r.flex?.cls || "", flexSpec: r.flex?.spec || "", offspec: r.offspec || "", interests: r.interests || [], roster: r.roster || "",
-      tz: r.tz || guessTz(), days: r.days || [], start: r.start || "", end: r.end || "",
+      tz: C.serverTimezone, days: r.days || [], start: srvTime(r, r.start), end: srvTime(r, r.end),
       prof1: (r.professions || [])[0] || "", prof2: (r.professions || [])[1] || "", profChange: r.profChange || "", notes: r.notes || ""
     };
   }
@@ -293,7 +280,7 @@
       block("Main", 1, [["Class & spec", specName(r.main.cls, r.main.spec)], ["Role", r.role], ["Commitment", labelOf(C.commitment, r.commitment)]]) +
       block("Flex pick", 2, [["Flex", r.flex.cls ? specName(r.flex.cls, r.flex.spec) : "No flex pick"], ["Raid-ready off-spec", labelOf(C.offspec, r.offspec)]]) +
       block("Playstyle", 3, [["Interests", r.interests.join(", ")], ["Roster", labelOf(C.rosterPrefs, r.roster)]]) +
-      block("Schedule", 4, [["Timezone", r.tz ? tzLabel(r.tz) : ""], ["Days", r.days.join(", ")], ["Window", r.start && r.end ? `${r.start} to ${r.end}` : ""]]) +
+      block("Schedule", 4, [["Days", r.days.join(", ")], ["Window", r.start && r.end ? `${r.start} to ${r.end} ${C.serverTimezoneLabel.replace(/^Server time /, "")}` : ""]]) +
       block("Professions", 5, [["Professions", r.professions.filter(Boolean).join(" + ")], ["Would switch", labelOf(C.profChange, r.profChange)], ["Notes", r.notes]]);
   }
   async function submit() {
@@ -340,11 +327,11 @@
         <span class="status need">${n ? pct + "% of riders" : "No riders yet"}</span></div>`;
     }).join("");
     const byCls = {}; roster.forEach(r => byCls[r.cls] = (byCls[r.cls] || 0) + 1);
-    $("#class-chips").innerHTML = classes.map(c => `<div class="cls-chip ${byCls[c.key] ? "" : "zero"}" style="--cc:${c.color}"><svg class="ci" aria-hidden="true"><use href="#c-${c.key}"/></svg><span class="n">${c.name}</span><span class="v num">${byCls[c.key] || 0}</span></div>`).join("");
+    $("#class-chips").innerHTML = classes.map(c => `<div class="cls-chip ${byCls[c.key] ? "" : "zero"}" style="--cc:${c.color}"><img class="ci" src="${c.key}.webp" alt="${esc(c.name)}" aria-hidden="true" onerror="this.style.display='none'"><span class="n">${c.name}</span><span class="v num">${byCls[c.key] || 0}</span></div>`).join("");
     const latest = roster.slice().sort((a, b) => String(b.submittedAt).localeCompare(String(a.submittedAt))).slice(0, 12);
     $("#riders").innerHTML = latest.length ? latest.map(r => {
       const c = clsBy(r.cls) || { color: "#aaa", name: r.cls }; const sp = specBy(r.cls, r.spec);
-      return `<li style="--cc:${c.color}"><i class="dot" aria-hidden="true"></i><span class="who"><b>${esc(r.character)}</b><span>${esc(sp ? sp.name : "")} ${esc(c.name)} · ${esc(r.role)}</span></span></li>`;
+      return `<li style="--cc:${c.color}"><img class="rider-cls-img" src="${c.key}.webp" alt="" aria-hidden="true" onerror="this.style.display='none'"><span class="who"><b>${esc(r.character)}</b><span>${esc(sp ? sp.name : "")} ${esc(c.name)} · ${esc(r.role)}</span></span></li>`;
     }).join("") : `<li class="empty" style="grid-column:1/-1;display:block">No riders yet. Be the first name on the board.</li>`;
     $("#live-text").textContent = store && store.mode === "demo" ? "Sample riders" : "Live count";
   }
@@ -361,14 +348,17 @@
   /* ------------------------------------------------------------------ */
   function enterCouncil() {
     if (!store) return;
-    const locked = !store.canLead;
-    $("#council-locked").hidden = !locked; $("#council-body").hidden = locked;
-    if (locked) {
-      if (store.mode === "supabase") { $("#login-form").hidden = false; $("#locked-text").textContent = "Sign in with your leadership email to see full responses."; }
-      else $("#locked-text").textContent = "Only guild leadership (editors of this page) can see full responses.";
-      return;
-    }
+    const lead = !!store.canLead, showLogin = !lead && store.mode === "supabase";
+    const locked = !store.canView && !lead;
+    $("#council-locked").hidden = !(locked || loginOpen); $("#council-body").hidden = locked;
+    $("#login-form").hidden = !showLogin;
+    $("#council-locked").classList.toggle("inline", !locked);
+    $("#locked-text").textContent = showLogin ? "Leaders: sign in with your leadership email to remove entries and export." : "Responses aren't available in this view.";
+    if (locked) return;
     $("#btn-reset-demo").hidden = store.mode !== "demo";
+    $("#btn-csv").hidden = !lead;
+    $("#btn-lead-login").hidden = !showLogin || loginOpen;
+    document.body.classList.toggle("is-lead", lead);
     if (!unsubResponses) unsubResponses = store.watchResponses(list => { responses = dedupe(list); renderCouncil(); });
     fillTargetsForm(); renderCouncil();
   }
@@ -432,7 +422,7 @@
   }
 
   function renderHeat() {
-    const ref = $("#ref-tz").value || C.serverTimezone, refOff = tzOffsetMin(ref);
+    const refOff = tzOffsetMin(C.serverTimezone);
     const grid = Array.from({ length: 7 }, () => new Array(24).fill(0));
     responses.forEach(r => {
       if (!r.start || !r.end || !r.days) return;
@@ -485,16 +475,15 @@
   function renderTable() {
     const q = ($("#resp-search").value || "").toLowerCase().trim();
     const rows = responses.filter(r => !q || JSON.stringify(r).toLowerCase().includes(q)).sort((a, b) => String(b.submittedAt).localeCompare(String(a.submittedAt)));
-    $("#resp-table").innerHTML = `<thead><tr><th>Character</th><th>Discord</th><th>Main</th><th>Role</th><th>Commit</th><th>Flex</th><th>Off-spec</th><th>Roster</th><th>Days</th><th>Window (own tz)</th><th>Professions</th><th>Notes</th><th></th></tr></thead><tbody>` +
+    $("#resp-table").innerHTML = `<thead><tr><th>Character</th><th>Discord</th><th>Main</th><th>Role</th><th>Commit</th><th>Flex</th><th>Off-spec</th><th>Roster</th><th>Days</th><th>Window (server)</th><th>Professions</th><th>Notes</th><th class="lead-only"></th></tr></thead><tbody>` +
       (rows.map(r => {
         const c = clsBy(r.main && r.main.cls) || { color: "#ccc" };
-        return `<tr><td class="cc" style="--cc:${c.color}">${esc(r.character)}${r.demo ? ' <span class="muted">(sample)</span>' : ""}</td><td>${esc(r.discord)}</td><td>${esc(specName(r.main.cls, r.main.spec))}</td><td>${esc(r.role)}</td><td>${esc(labelOf(C.commitment, r.commitment))}</td><td>${r.flex && r.flex.cls ? esc(specName(r.flex.cls, r.flex.spec)) : "—"}</td><td>${esc(labelOf(C.offspec, r.offspec).split(",")[0])}</td><td>${esc(labelOf(C.rosterPrefs, r.roster))}</td><td>${esc((r.days || []).join(" "))}</td><td style="white-space:nowrap">${esc(r.start)}–${esc(r.end)}<br><span class="muted">${esc(r.tz ? fmtOffset(tzOffsetMin(r.tz)) : "")}</span></td><td>${esc((r.professions || []).join(" + "))}</td><td style="min-width:180px">${esc(r.notes)}</td><td><button class="linkbtn" data-del="${esc(r.id)}" data-name="${esc(r.character)}">Remove</button></td></tr>`;
+        return `<tr><td class="cc" style="--cc:${c.color}">${esc(r.character)}${r.demo ? ' <span class="muted">(sample)</span>' : ""}</td><td>${esc(r.discord)}</td><td>${esc(specName(r.main.cls, r.main.spec))}</td><td>${esc(r.role)}</td><td>${esc(labelOf(C.commitment, r.commitment))}</td><td>${r.flex && r.flex.cls ? esc(specName(r.flex.cls, r.flex.spec)) : "—"}</td><td>${esc(labelOf(C.offspec, r.offspec).split(",")[0])}</td><td>${esc(labelOf(C.rosterPrefs, r.roster))}</td><td>${esc((r.days || []).join(" "))}</td><td style="white-space:nowrap">${esc(srvTime(r, r.start))}–${esc(srvTime(r, r.end))}</td><td>${esc((r.professions || []).join(" + "))}</td><td style="min-width:180px">${esc(r.notes)}</td><td class="lead-only"><button class="linkbtn" data-del="${esc(r.id)}" data-name="${esc(r.character)}">Remove</button></td></tr>`;
       }).join("") || `<tr><td colspan="13" class="muted">No matching responses.</td></tr>`) + `</tbody>`;
   }
   $("#resp-search").addEventListener("input", renderTable);
-  $("#ref-tz").addEventListener("change", renderHeat);
   document.addEventListener("click", async e => {
-    const b = e.target.closest("[data-del]"); if (!b) return;
+    const b = e.target.closest("[data-del]"); if (!b || !store || !store.canLead) return;
     if (b.dataset.confirm !== "1") { b.dataset.confirm = "1"; b.textContent = "Confirm remove"; setTimeout(() => { if (b.isConnected) { b.dataset.confirm = ""; b.textContent = "Remove"; } }, 4000); return; }
     try { await store.remove(b.dataset.del); toast(`Removed ${b.dataset.name}.`); } catch (err) { toast("Couldn't remove: " + err.message); }
   });
@@ -512,16 +501,18 @@
   $("#btn-reset-demo").addEventListener("click", async () => { if (store.reset) { await store.reset(); mine = null; renderMe(); toast("Demo data reset."); } });
 
   $("#btn-csv").addEventListener("click", async () => {
-    const cols = ["submittedAt", "character", "discord", "mainClass", "mainSpec", "role", "commitment", "flexClass", "flexSpec", "flexRole", "offspec", "interests", "roster", "timezone", "utcOffset", "days", "start", "end", "profession1", "profession2", "profChange", "notes"];
+    const cols = ["submittedAt", "character", "discord", "mainClass", "mainSpec", "role", "commitment", "flexClass", "flexSpec", "flexRole", "offspec", "interests", "roster", "days", "startServer", "endServer", "profession1", "profession2", "profChange", "notes"];
     const q = s => `"${String(s == null ? "" : s).replace(/"/g, '""')}"`;
     const lines = [cols.join(",")].concat(responses.map(r => [
       r.submittedAt, r.character, r.discord, clsBy(r.main.cls)?.name, specBy(r.main.cls, r.main.spec)?.name, r.role, labelOf(C.commitment, r.commitment),
       clsBy(r.flex?.cls)?.name || "", specBy(r.flex?.cls, r.flex?.spec)?.name || "", r.flex?.role || "", labelOf(C.offspec, r.offspec),
-      (r.interests || []).join("; "), labelOf(C.rosterPrefs, r.roster), r.tz, r.tz ? fmtOffset(tzOffsetMin(r.tz)) : "", (r.days || []).join(" "), r.start, r.end,
+      (r.interests || []).join("; "), labelOf(C.rosterPrefs, r.roster), (r.days || []).join(" "), srvTime(r, r.start), srvTime(r, r.end),
       (r.professions || [])[0], (r.professions || [])[1], labelOf(C.profChange, r.profChange), r.notes
     ].map(q).join(",")));
     try { await store.download(`midnight-rodeo-roster-${new Date().toISOString().slice(0, 10)}.csv`, lines.join("\n")); } catch (e) { if (e && e.code !== "declined") toast("Export didn't finish: " + (e.message || e.code)); }
   });
+  let loginOpen = false;
+  $("#btn-lead-login").addEventListener("click", () => { loginOpen = true; enterCouncil(); $("#login-email").focus(); });
   $("#login-form").addEventListener("submit", async e => {
     e.preventDefault(); const em = $("#login-email").value.trim();
     if (!/^\S+@\S+\.\S+$/.test(em)) { toast("Enter a valid email address."); return; }
@@ -539,7 +530,7 @@
     pill.textContent = { artifact: "Live", supabase: "Live", demo: "Demo mode", offline: "View only" }[store.mode];
     pill.classList.toggle("demo", store.mode === "demo");
     pill.classList.toggle("live", store.mode === "artifact" || store.mode === "supabase");
-    pill.title = store.mode === "demo" ? "Answers are saved only in this browser and sample riders are shown." : store.mode === "offline" ? "This view can't save answers. Ask guild leadership for access." : "Answers are shared with guild leadership.";
+    pill.title = store.mode === "demo" ? "Answers are saved only in this browser and sample riders are shown." : store.mode === "offline" ? "This view can't save answers. Ask guild leadership for access." : "Answers are visible to everyone in the War Room.";
     $("#nav-council").hidden = !(store.canLead || store.mode === "supabase"); try { if (store.canLead && localStorage.getItem("mr-go-council")) { localStorage.removeItem("mr-go-council"); location.hash = "#council"; } } catch (e) {}
     try {
       mine = await store.myResponse();

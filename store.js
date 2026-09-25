@@ -32,6 +32,7 @@
     return {
       mode: "artifact",
       canLead: lead,
+      canView: true,
       canSubmit: !!uid && canWrite,
       async myResponse() {
         if (!uid) return null;
@@ -89,6 +90,7 @@
     return {
       mode: "supabase",
       canLead: lead,
+      canView: true,
       canSubmit: true,
       async myResponse() {
         try { return JSON.parse(localStorage.getItem(myKey) || "null"); } catch (e) { return null; }
@@ -126,7 +128,7 @@
         if (error) throw new Error(error.message);
       },
       async signIn(email) {
-        const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: location.href.split("#")[0] + "#council" } });
+        try { localStorage.setItem("mr-go-council", "1"); } catch (e) {} const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: location.href.split("#")[0] } });
         if (error) throw new Error(error.message);
       },
       async download(name, text) { blobDownload(name, text); }
@@ -150,6 +152,7 @@
     return {
       mode: "demo",
       canLead: true,
+      canView: true,
       canSubmit: true,
       async myResponse() { return state.mine ? state.responses.find(r => r.id === state.mine) || null : null; },
       async submit(r) {
@@ -172,7 +175,7 @@
   function offlineStore() {
     const empty = cb => { setTimeout(() => cb([]), 0); return () => {}; };
     return {
-      mode: "offline", canLead: false, canSubmit: false,
+      mode: "offline", canLead: false, canView: false, canSubmit: false,
       async myResponse() { return null; },
       async submit() { throw new Error("Saving isn't available in this view."); },
       watchRoster: empty, watchResponses: empty,
