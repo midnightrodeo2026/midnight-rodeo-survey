@@ -540,7 +540,7 @@
     pill.classList.toggle("demo", store.mode === "demo");
     pill.classList.toggle("live", store.mode === "artifact" || store.mode === "supabase");
     pill.title = store.mode === "demo" ? "Answers are saved only in this browser and sample riders are shown." : store.mode === "offline" ? "This view can't save answers. Ask guild leadership for access." : "Answers are shared with guild leadership.";
-    $("#nav-council").hidden = !store.canLead;
+    $("#nav-council").hidden = !(store.canLead || store.mode === "supabase"); try { if (store.canLead && localStorage.getItem("mr-go-council")) { localStorage.removeItem("mr-go-council"); location.hash = "#council"; } } catch (e) {}
     try {
       mine = await store.myResponse();
       if (mine) {
