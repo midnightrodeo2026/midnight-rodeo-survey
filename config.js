@@ -16,7 +16,7 @@ window.MR_CONFIG = {
   /* Optional Supabase backend for the self-hosted version
      (see README.md + supabase/schema.sql). Leave blank to use the
      built-in storage (Claude artifact) or local demo mode. */
-  supabase: { url: "https://kmueigrekqqmjmznpevb.supabase.co", anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttdWVpZ3Jla3FxbWptem5wZXZiIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc5MDMwNzg3MiwiZXhwIjoyMTA1ODgzODcyfQ.eMXu-x_MBgvfP30VhTURfcXhrKrvbyD1oDUuMPg8cp8" },
+  supabase: { url: "https://kmueigrekqqmjmznpevb.supabase.co", anonKey: "PASTE-ANON-KEY-HERE" },
 
   /* Reference timezone for the Council availability heatmap. */
   serverTimezone: "America/New_York",
