@@ -531,3 +531,8 @@ img.ri { flex: none; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0
 .edit-code-box span { font: 600 12px/1 var(--f-ui); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
 .edit-code-box b { font: 700 22px/1.2 ui-monospace, Consolas, monospace; letter-spacing: .12em; color: var(--gold-hi); overflow-wrap: anywhere; }
 .edit-code-box small { color: var(--muted); font-size: 13px; line-height: 1.4; }
+
+/* Music button pulses until the visitor's first click starts the song */
+.music-btn.nudge { color: var(--gold-hi); border-color: rgba(201,164,92,.6); animation: mr-nudge 1.6s ease-in-out infinite; }
+@keyframes mr-nudge { 0%,100% { box-shadow: 0 0 0 0 rgba(201,164,92,.0); } 50% { box-shadow: 0 0 0 5px rgba(201,164,92,.25); } }
+@media (prefers-reduced-motion: reduce) { .music-btn.nudge { animation: none; } }

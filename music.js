@@ -6,23 +6,32 @@
   const btn = document.getElementById("music-btn");
   if (!btn) return;
   const audio = new Audio(SONG);
-  audio.loop = true; audio.volume = VOLUME; audio.preload = "metadata";
+  audio.loop = true; audio.volume = VOLUME; audio.preload = "auto";
   const KEY = "mr-music";
   const saved = () => { try { return localStorage.getItem(KEY); } catch (e) { return null; } };
   const save = v => { try { localStorage.setItem(KEY, v); } catch (e) {} };
-  const sync = () => { const on = !audio.paused; btn.classList.toggle("on", on); btn.setAttribute("aria-pressed", on); btn.title = on ? "Pause music" : "Play music"; };
-  audio.addEventListener("canplay", () => { btn.hidden = false; }, { once: true });
+  const sync = () => {
+    const on = !audio.paused;
+    btn.classList.toggle("on", on); if (on) btn.classList.remove("nudge");
+    btn.setAttribute("aria-pressed", on); btn.title = on ? "Pause music" : "Play music";
+  };
+  btn.hidden = false;
   audio.addEventListener("error", () => { btn.hidden = true; });
   audio.addEventListener("play", sync); audio.addEventListener("pause", sync);
   btn.addEventListener("click", () => {
     if (audio.paused) { audio.play().catch(() => {}); save("on"); } else { audio.pause(); save("off"); }
   });
-  // Auto-start on page load unless the visitor turned it off.
-  // Browsers block sound until the first click/tap/key, so if the first try is
-  // blocked it starts on the visitor's first interaction with the page.
+  // Start on page load unless the visitor turned it off. Browsers block sound
+  // until the visitor clicks, taps or presses a key, so if the first try is
+  // blocked, the music starts on their first click/tap anywhere on the page.
   if (saved() !== "off") {
-    const evs = ["pointerdown", "keydown", "touchstart"];
-    const start = e => { if (btn.contains(e.target)) return; evs.forEach(e => document.removeEventListener(e, start, true)); if (audio.paused && saved() !== "off") audio.play().catch(() => {}); };
-    audio.play().catch(() => { evs.forEach(e => document.addEventListener(e, start, true)); });
+    const evs = ["pointerdown", "pointerup", "click", "keydown", "touchend"];
+    const off = () => evs.forEach(e => document.removeEventListener(e, start, true));
+    const start = e => {
+      if (e && btn.contains(e.target)) return;
+      if (!audio.paused || saved() === "off") return off();
+      audio.play().then(off).catch(() => {});
+    };
+    audio.play().catch(() => { btn.classList.add("nudge"); evs.forEach(e => document.addEventListener(e, start, true)); });
   }
 })();
