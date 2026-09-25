@@ -72,7 +72,7 @@
     if (!window.supabase) {
       await new Promise((res, rej) => {
         const s = document.createElement("script");
-        s.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js";
+        s.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js";
         s.onload = res; s.onerror = rej; document.head.appendChild(s);
       });
     }
