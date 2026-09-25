@@ -496,3 +496,20 @@ body:not(.is-lead) .lead-only { display: none; }
 #council-locked:not([hidden]) + #council-body:not([hidden]) { margin-top: -10px; }
 #council-locked.inline { padding: 18px 0 0; min-height: 0; text-align: left; }
 #council-locked.inline .eyebrow, #council-locked.inline h1 { display: none; }
+
+/* War Room class art */
+.sc-head img.ci { width: 34px; height: 34px; object-fit: contain; filter: drop-shadow(0 0 6px color-mix(in srgb, var(--cc) 45%, transparent)) drop-shadow(0 2px 3px rgba(0,0,0,.8)); }
+.hbar .t img.ci { width: 22px; height: 22px; object-fit: contain; margin-right: 6px; vertical-align: middle; filter: drop-shadow(0 1px 2px rgba(0,0,0,.8)); }
+
+/* Music toggle */
+.music-btn { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border: 1px solid var(--line-hi); border-radius: 99px; background: transparent; color: var(--muted); cursor: pointer; }
+.music-btn[hidden] { display: none; }
+.music-btn svg { width: 14px; height: 14px; }
+.music-btn:hover { color: var(--bone); }
+.music-btn.on { color: var(--gold-hi); border-color: rgba(201,164,92,.6); background: rgba(201,164,92,.08); }
+.music-btn .eq { display: none; align-items: flex-end; gap: 2px; height: 12px; }
+.music-btn.on .eq { display: inline-flex; }
+.music-btn .eq i { width: 2px; background: currentColor; animation: mr-eq .9s ease-in-out infinite; }
+.music-btn .eq i:nth-child(2) { animation-delay: .2s; } .music-btn .eq i:nth-child(3) { animation-delay: .4s; }
+@keyframes mr-eq { 0%,100% { height: 3px; } 50% { height: 12px; } }
+@media (prefers-reduced-motion: reduce) { .music-btn .eq i { animation: none; height: 8px; } }

@@ -370,7 +370,7 @@
   function hbars(rows, max, color) {
     return rows.map(r => {
       const segs = (r.segs || [{ v: r.v, c: r.c || color }]).map(s => `<i style="width:${max ? s.v / max * 100 : 0}%;background:${s.c}"></i>`).join("");
-      return `<div class="hbar"><span class="t" title="${esc(r.label)}" ${r.tc ? `style="color:${r.tc}"` : ""}>${esc(r.label)}</span><span class="track">${segs}</span><span class="v">${r.text != null ? r.text : r.v}</span></div>`;
+      return `<div class="hbar"><span class="t" title="${esc(r.label)}" ${r.tc ? `style="color:${r.tc}"` : ""}>${r.img ? `<img class="ci" src="${r.img}" alt="" aria-hidden="true" onerror="this.style.display='none'">` : ""}${esc(r.label)}</span><span class="track">${segs}</span><span class="v">${r.text != null ? r.text : r.v}</span></div>`;
     }).join("") || `<p class="empty">No responses yet.</p>`;
   }
   const countBy = (arr, f) => arr.reduce((m, x) => { [].concat(f(x)).forEach(k => { if (k) m[k] = (m[k] || 0) + 1; }); return m; }, {});
@@ -396,11 +396,11 @@
     // class counts main + flex
     const mainC = countBy(R, r => r.main && r.main.cls), flexC = countBy(R, r => r.flex && r.flex.cls);
     const cmax = Math.max(1, ...classes.map(c => (mainC[c.key] || 0) + (flexC[c.key] || 0)));
-    $("#class-dist").innerHTML = hbars(classes.map(c => ({ label: c.name, tc: c.color, segs: [{ v: mainC[c.key] || 0, c: c.color }, { v: flexC[c.key] || 0, c: "#5a4234" }], text: `${mainC[c.key] || 0}+${flexC[c.key] || 0}` })), cmax);
+    $("#class-dist").innerHTML = hbars(classes.map(c => ({ label: c.name, img: c.key + ".webp", tc: c.color, segs: [{ v: mainC[c.key] || 0, c: c.color }, { v: flexC[c.key] || 0, c: "#5a4234" }], text: `${mainC[c.key] || 0}+${flexC[c.key] || 0}` })), cmax);
 
     // specs grouped by class
     const specC = countBy(R, r => r.main && (r.main.cls + "/" + r.main.spec)), flexSpecC = countBy(R, r => r.flex && r.flex.cls && (r.flex.cls + "/" + r.flex.spec));
-    $("#spec-grid").innerHTML = classes.map(c => `<div class="spec-card" style="--cc:${c.color}"><div class="sc-head"><svg class="ci" aria-hidden="true"><use href="#c-${c.key}"/></svg>${c.name}<span class="num">${mainC[c.key] || 0}</span></div>` +
+    $("#spec-grid").innerHTML = classes.map(c => `<div class="spec-card" style="--cc:${c.color}"><div class="sc-head"><img class="ci" src="${c.key}.webp" alt="" aria-hidden="true" onerror="this.style.display='none'">${c.name}<span class="num">${mainC[c.key] || 0}</span></div>` +
       c.specs.map(s => { const m = specC[c.key + "/" + s.key] || 0, f = flexSpecC[c.key + "/" + s.key] || 0;
         return `<div class="sc-row${m || f ? "" : " none"}"><span>${esc(s.name)}<small>${s.roles.join(" / ")}</small></span><b class="num">${m}</b><i class="num">${f}</i></div>`; }).join("") + `</div>`).join("");
 
