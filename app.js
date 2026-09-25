@@ -65,7 +65,7 @@
     return `<label class="tile ${extra}" for="${id}"><input type="${type}" id="${id}" name="${name}" value="${esc(value)}"><span>${inner}</span></label>`;
   }
   function buildStatic() {
-    $("#main-cls").innerHTML = classes.map(c => tile("radio", "mainCls", c.key, esc(c.name), "cls").replace('class="tile cls"', `class="tile cls" style="--cc:${c.color}"`)).join("");
+    $("#main-cls").innerHTML = classes.map(c => tile("radio", "mainCls", c.key, `<span class="ico"><svg class="ci" aria-hidden="true"><use href="#c-${c.key}"/></svg>${esc(c.name)}</span>`, "cls").replace('class="tile cls"', `class="tile cls" style="--cc:${c.color}"`)).join("");
     $("#role-tiles").innerHTML = C.roles.map(r => tile("radio", "role", r, `<span class="ico"><svg aria-hidden="true"><use href="#${roleIcon(r)}"/></svg>${esc(r)}</span>`)).join("");
     $("#commit-tiles").innerHTML = C.commitment.map(o => tile("radio", "commitment", o.key, `${esc(o.label)}<small>${esc(o.hint)}</small>`)).join("");
     $("#f-flexCls").innerHTML = `<option value="">No flex pick</option>` + classes.map(c => `<option value="${c.key}">${esc(c.name)}</option>`).join("");
@@ -327,20 +327,20 @@
   function renderHome() {
     const t = T(); const n = roster.length;
     $("#ring-count").textContent = n;
-    $("#ring-goal").textContent = `of ${t.rosterGoal} riders`;
-    const circ = 2 * Math.PI * 52, frac = Math.min(1, n / Math.max(1, t.rosterGoal));
+    $("#ring-goal").textContent = n === 1 ? "rider on the board" : "riders on the board";
+    const circ = 2 * Math.PI * 52, frac = n ? 1 : 0;
     $("#ring-arc").setAttribute("stroke-dasharray", `${(circ * frac).toFixed(1)} 400`);
-    $("#ring").setAttribute("aria-label", `${n} of ${t.rosterGoal} riders have answered`);
+    $("#ring").setAttribute("aria-label", `${n} riders have answered`);
     const byRole = {}; C.roles.forEach(r => byRole[r] = 0); roster.forEach(r => { if (byRole[r.role] != null) byRole[r.role]++; });
+    const roleMax = Math.max(1, ...C.roles.map(r => byRole[r]));
     $("#role-cards").innerHTML = C.roles.map(r => {
-      const goal = t.roles[r] || 0, have = byRole[r], met = have >= goal && goal > 0;
-      const need = Math.max(0, goal - have);
-      return `<div class="role-card"><div class="top"><svg aria-hidden="true"><use href="#${roleIcon(r)}"/></svg><span class="name">${r}</span><span class="count num">${have}<small> / ${goal}</small></span></div>
-        <div class="bar ${met ? "full" : ""}"><i style="width:${goal ? Math.min(100, have / goal * 100) : 0}%"></i></div>
-        <span class="status ${met ? "met" : "need"}">${met ? "Target met" : `Need ${need} more`}</span></div>`;
+      const have = byRole[r], pct = n ? Math.round(have / n * 100) : 0;
+      return `<div class="role-card"><div class="top"><svg aria-hidden="true"><use href="#${roleIcon(r)}"/></svg><span class="name">${r}</span><span class="count num">${have}</span></div>
+        <div class="bar"><i style="width:${have / roleMax * 100}%"></i></div>
+        <span class="status need">${n ? pct + "% of riders" : "No riders yet"}</span></div>`;
     }).join("");
     const byCls = {}; roster.forEach(r => byCls[r.cls] = (byCls[r.cls] || 0) + 1);
-    $("#class-chips").innerHTML = classes.map(c => `<div class="cls-chip ${byCls[c.key] ? "" : "zero"}" style="--cc:${c.color}"><span class="n">${c.name}</span><span class="v num">${byCls[c.key] || 0}</span></div>`).join("");
+    $("#class-chips").innerHTML = classes.map(c => `<div class="cls-chip ${byCls[c.key] ? "" : "zero"}" style="--cc:${c.color}"><svg class="ci" aria-hidden="true"><use href="#c-${c.key}"/></svg><span class="n">${c.name}</span><span class="v num">${byCls[c.key] || 0}</span></div>`).join("");
     const latest = roster.slice().sort((a, b) => String(b.submittedAt).localeCompare(String(a.submittedAt))).slice(0, 12);
     $("#riders").innerHTML = latest.length ? latest.map(r => {
       const c = clsBy(r.cls) || { color: "#aaa", name: r.cls }; const sp = specBy(r.cls, r.spec);
@@ -380,7 +380,7 @@
   function hbars(rows, max, color) {
     return rows.map(r => {
       const segs = (r.segs || [{ v: r.v, c: r.c || color }]).map(s => `<i style="width:${max ? s.v / max * 100 : 0}%;background:${s.c}"></i>`).join("");
-      return `<div class="hbar"><span class="t" ${r.tc ? `style="color:${r.tc}"` : ""}>${esc(r.label)}</span><span class="track">${segs}</span><span class="v">${r.text != null ? r.text : r.v}</span></div>`;
+      return `<div class="hbar"><span class="t" title="${esc(r.label)}" ${r.tc ? `style="color:${r.tc}"` : ""}>${esc(r.label)}</span><span class="track">${segs}</span><span class="v">${r.text != null ? r.text : r.v}</span></div>`;
     }).join("") || `<p class="empty">No responses yet.</p>`;
   }
   const countBy = (arr, f) => arr.reduce((m, x) => { [].concat(f(x)).forEach(k => { if (k) m[k] = (m[k] || 0) + 1; }); return m; }, {});
@@ -391,16 +391,16 @@
     const roleC = countBy(R, r => r.role);
     const core = R.filter(r => r.roster === "core").length;
     const flexers = R.filter(r => ["flexible", "open"].includes(r.commitment)).length;
+    const switchers = R.filter(r => r.profChange === "yes").length, offs = R.filter(r => r.offspec === "yes").length;
     $("#kpis").innerHTML = [
-      ["Responses", n, `goal ${t.rosterGoal}`], ["Core raiders", core, `${R.filter(r => r.roster === "regular").length} regular`],
-      ["Tanks · Healers", `${roleC.Tank || 0} · ${roleC.Healer || 0}`, `targets ${t.roles.Tank} · ${t.roles.Healer}`], ["Flexible riders", flexers, "flexible or completely flexible"]
+      ["Riders", n, "answered so far"], ["Core raiders", core, `${R.filter(r => r.roster === "regular").length} regular raiders`],
+      ["Flexible", flexers, `${offs} keep a raid-ready off-spec`], ["Will switch professions", switchers, `${R.filter(r => r.profChange === "maybe").length} maybe`]
     ].map(k => `<div class="kpi"><span>${k[0]}</span><b class="num">${k[1]}</b><small>${k[2]}</small></div>`).join("");
 
-    // role distribution vs target
-    const rmax = Math.max(1, ...C.roles.map(r => Math.max(roleC[r] || 0, t.roles[r] || 0)));
+    // roles as tiles
     $("#role-dist").innerHTML = C.roles.map(r => {
-      const have = roleC[r] || 0, goal = t.roles[r] || 0;
-      return `<div class="hbar"><span class="t">${r}</span><span class="track" style="position:relative"><i style="width:${have / rmax * 100}%;background:#d42a2f"></i><b style="position:absolute;left:${goal / rmax * 100}%;top:-3px;bottom:-3px;width:2px;background:#ecd092"></b></span><span class="v">${have}/${goal}</span></div>`;
+      const v = roleC[r] || 0, pct = n ? Math.round(v / n * 100) : 0;
+      return `<div class="rtile"><svg aria-hidden="true"><use href="#${roleIcon(r)}"/></svg><b class="num">${v}</b><span>${r}</span><small>${pct}%</small></div>`;
     }).join("");
 
     // class counts main + flex
@@ -408,10 +408,11 @@
     const cmax = Math.max(1, ...classes.map(c => (mainC[c.key] || 0) + (flexC[c.key] || 0)));
     $("#class-dist").innerHTML = hbars(classes.map(c => ({ label: c.name, tc: c.color, segs: [{ v: mainC[c.key] || 0, c: c.color }, { v: flexC[c.key] || 0, c: "#5a4234" }], text: `${mainC[c.key] || 0}+${flexC[c.key] || 0}` })), cmax);
 
-    // spec table
+    // specs grouped by class
     const specC = countBy(R, r => r.main && (r.main.cls + "/" + r.main.spec)), flexSpecC = countBy(R, r => r.flex && r.flex.cls && (r.flex.cls + "/" + r.flex.spec));
-    $("#spec-table").innerHTML = `<thead><tr><th>Class</th><th>Spec</th><th>Role</th><th class="num">Main</th><th class="num">Flex</th></tr></thead><tbody>` +
-      classes.flatMap(c => c.specs.map(s => `<tr><td class="cc" style="--cc:${c.color}">${c.name}</td><td>${esc(s.name)}</td><td class="muted">${s.roles.join(" / ")}</td><td class="num">${specC[c.key + "/" + s.key] || 0}</td><td class="num muted">${flexSpecC[c.key + "/" + s.key] || 0}</td></tr>`)).join("") + `</tbody>`;
+    $("#spec-grid").innerHTML = classes.map(c => `<div class="spec-card" style="--cc:${c.color}"><div class="sc-head"><svg class="ci" aria-hidden="true"><use href="#c-${c.key}"/></svg>${c.name}<span class="num">${mainC[c.key] || 0}</span></div>` +
+      c.specs.map(s => { const m = specC[c.key + "/" + s.key] || 0, f = flexSpecC[c.key + "/" + s.key] || 0;
+        return `<div class="sc-row${m || f ? "" : " none"}"><span>${esc(s.name)}<small>${s.roles.join(" / ")}</small></span><b class="num">${m}</b><i class="num">${f}</i></div>`; }).join("") + `</div>`).join("");
 
     // professions
     const profC = countBy(R, r => (r.professions || []).filter(Boolean));
@@ -460,6 +461,7 @@
   }
 
   function renderGaps(roleC, mainC, profC) {
+    if (!$("#gaps")) return;
     const t = T(), g = [];
     const sev = { high: "#e2554a", med: "#e0a53a", low: "#6fbf73" };
     C.roles.forEach(r => {
@@ -468,7 +470,7 @@
         const swap = responses.filter(x => x.role !== r && ["flexible", "open"].includes(x.commitment) && x.flex && x.flex.role === r).map(x => x.character);
         const os = responses.filter(x => x.role !== r && x.offspec === "yes" && (specsFor(x.main.cls).includes(r))).map(x => x.character);
         g.push({ s: goal - have >= Math.ceil(goal / 2) ? "high" : "med", html: `<b>${r}: ${have} of ${goal}</b>, short ${goal - have}.` + (swap.length ? ` Flex candidates: ${esc(swap.slice(0, 6).join(", "))}.` : "") + (os.length ? ` Raid-ready off-spec possible: ${esc(os.slice(0, 6).join(", "))}.` : "") });
-      } else if (goal && have > goal + 2) g.push({ s: "low", html: `<b>${r}: ${have} of ${goal}</b>, ${have - goal} over target. Some may need to bench or flex.` });
+      } else if (goal && have > goal + 2) g.push({ s: "low", html: `<b>${r}: ${have} of ${goal}</b>, ${have - goal} above target. Good depth for flex and alts.` });
     });
     const missing = classes.filter(c => !mainC[c.key]).map(c => c.name);
     if (missing.length && responses.length) g.push({ s: "med", html: `<b>No mains yet:</b> ${esc(missing.join(", "))}. Raid buffs and utility from these classes are uncovered.` });
@@ -498,11 +500,12 @@
   });
 
   function fillTargetsForm() {
-    const t = T(); $("#t-goal").value = t.rosterGoal; C.roles.forEach(r => $("#t-" + CSS.escape(r)).value = t.roles[r]);
+    if (!$("#targets-form")) return;
+    const t = T(); C.roles.forEach(r => $("#t-" + CSS.escape(r)).value = t.roles[r]);
   }
-  $("#btn-targets").addEventListener("click", async () => {
+  $("#btn-targets")?.addEventListener("click", async () => {
     const num = id => Math.max(0, Math.min(200, parseInt($(id).value, 10) || 0));
-    const nt = { rosterGoal: num("#t-goal") || 1, roles: {} };
+    const nt = { rosterGoal: T().rosterGoal || 0, roles: {} };
     C.roles.forEach(r => nt.roles[r] = num("#t-" + CSS.escape(r)));
     try { await store.saveTargets(nt); targets = nt; toast("Targets saved."); renderHome(); renderCouncil(); } catch (e) { toast("Couldn't save targets: " + e.message); }
   });
@@ -535,6 +538,7 @@
     const pill = $("#mode-pill");
     pill.textContent = { artifact: "Live", supabase: "Live", demo: "Demo mode", offline: "View only" }[store.mode];
     pill.classList.toggle("demo", store.mode === "demo");
+    pill.classList.toggle("live", store.mode === "artifact" || store.mode === "supabase");
     pill.title = store.mode === "demo" ? "Answers are saved only in this browser and sample riders are shown." : store.mode === "offline" ? "This view can't save answers. Ask guild leadership for access." : "Answers are shared with guild leadership.";
     $("#nav-council").hidden = !store.canLead;
     try {

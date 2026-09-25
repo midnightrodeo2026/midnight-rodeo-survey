@@ -208,7 +208,7 @@ input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(.8) sepia
 .tile input:focus-visible + span { outline: 2px solid var(--gold-hi); outline-offset: 2px; }
 .tile input:checked + span { border-color: var(--gold); background: linear-gradient(180deg, rgba(163,20,28,.35), rgba(163,20,28,.12)); color: var(--bone); box-shadow: inset 0 0 0 1px rgba(201,164,92,.35); }
 .tile input:disabled + span { opacity: .35; }
-.tile.cls span { border-left: 4px solid var(--cc); color: var(--cc); }
+.tile.cls > span { border-left: 4px solid var(--cc); color: var(--cc); }
 .tile.cls input:checked + span { color: var(--cc); }
 .tiles.days .tile > span { align-items: center; padding-inline: 4px; }
 
@@ -342,3 +342,115 @@ td.cc { color: var(--cc); font-weight: 700; }
 .start b { font-size: 25px; }
 .board-head h2 { font-size: 36px; }
 .card-head h2 { font-size: clamp(30px, 4vw, 40px); color: var(--bone); }
+
+/* ---------- Review fixes: crest-only branding ---------- */
+.topbar { justify-content: space-between; }
+.start .seal { overflow: hidden; padding: 0; background: #1a0f0f; }
+.start .seal img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+.hero .eyebrow { margin-top: 4px; }
+.hero .sub { margin-top: 10px; font-size: clamp(22px, 2.8vw, 30px); letter-spacing: .16em; }
+.hero-logo { width: min(460px, 100%); }
+@media (max-width: 600px) { .topbar { flex-wrap: nowrap; gap: 8px; } .topbar .nav { flex-wrap: nowrap; gap: 0; } .topbar .nav a { padding: 9px 7px; font-size: 13px; letter-spacing: .08em; } .mode-pill { font-size: 11px; padding: 5px 7px; letter-spacing: .1em; } }
+
+/* ---------- Review fixes: class icons, field alignment, open roster ---------- */
+.field { align-content: start; }
+.ci { width: 18px; height: 18px; flex: none; color: var(--cc, var(--gold)); }
+.cls-chip .ci { width: 20px; height: 20px; }
+.tile.cls > span .ico { gap: 8px; }
+.tile.cls > span svg.ci { color: var(--cc); width: 20px; height: 20px; }
+.hbar .t .ci { width: 14px; height: 14px; vertical-align: -2px; margin-right: 6px; }
+.targets-form { grid-template-columns: repeat(4, minmax(0,1fr)); }
+.mode-pill.live { color: #7fe08a; border-color: rgba(111, 191, 115, .6); background: rgba(111, 191, 115, .1); display: inline-flex; align-items: center; gap: 6px; }
+.mode-pill.live::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #6fdc7a; box-shadow: 0 0 8px #6fdc7a; }
+
+/* ---------- Logo-style lettering for headings (matches the crest wordmark) ---------- */
+.logo-text, .card-head h2, .council-head h1 {
+  font-family: var(--f-logo); font-weight: 400; text-transform: uppercase; letter-spacing: .03em;
+  background: linear-gradient(180deg, #fbf3e1 0%, #e6d6b8 45%, #9c8a70 58%, #efe2c6 72%, #b7a384 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  -webkit-text-stroke: 1px #2a1a12;
+  filter: drop-shadow(0 2px 0 #000) drop-shadow(0 0 14px rgba(212, 42, 47, .3));
+}
+.logo-text span {
+  background: linear-gradient(180deg, #ff5a4f 0%, #d42a2f 40%, #8e0f16 62%, #c81f26 80%, #6d0c12 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.board-head h2.logo-text { font-size: clamp(34px, 4.6vw, 48px); line-height: 1; }
+.section-title h3.logo-text { font-size: clamp(24px, 3vw, 30px); }
+
+/* ---------- Wordmark in top bar, sword seal, logo-style button label ---------- */
+.topbar { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 16px; }
+.topbar .nav { justify-self: center; }
+.wordmark { text-decoration: none; font-size: 26px; line-height: 1; white-space: nowrap; }
+.start .seal { background: radial-gradient(circle at 50% 40%, #d42a2f, #6d0c12 70%); padding: 0; }
+.start .seal .sword { width: 50px; height: 50px; filter: drop-shadow(0 2px 2px rgba(0,0,0,.6)); }
+.start b.logo-text { font-size: 30px; letter-spacing: .04em; }
+@media (max-width: 600px) {
+  .topbar { grid-template-columns: 1fr auto; row-gap: 6px; }
+  .wordmark { font-size: 22px; }
+  .topbar .nav { grid-column: 1 / -1; grid-row: 2; justify-self: start; }
+  .start b.logo-text { font-size: 24px; }
+}
+
+/* ---------- Smoke + war drums ---------- */
+canvas.smoke { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+.top-right { display: flex; align-items: center; gap: 10px; justify-self: end; }
+.music-btn { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--line-hi); background: rgba(11,8,8,.6); color: var(--muted); cursor: pointer; transition: color .2s, border-color .2s, box-shadow .2s; }
+.music-btn svg { width: 20px; height: 20px; }
+.music-btn:hover { color: var(--gold-hi); border-color: var(--gold-dim); }
+.music-btn[aria-pressed="true"] { color: var(--gold-hi); border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,42,47,.25), 0 0 16px rgba(212,42,47,.4); }
+@media (prefers-reduced-motion: no-preference) {
+  .music-btn[aria-pressed="true"] svg { animation: beat 0.79s ease-in-out infinite; }
+  @keyframes beat { 0%,100% { transform: scale(1); } 12% { transform: scale(1.14); } }
+}
+@media (max-width: 600px) { .music-btn { width: 32px; height: 32px; } .music-btn svg { width: 17px; height: 17px; } }
+.start .seal .axe { width: 54px; height: 54px; }
+.start .seal { background: radial-gradient(circle at 50% 38%, #3a1414, #120808 72%); }
+
+/* ---------- Top bar without wordmark ---------- */
+.topbar { grid-template-columns: 1fr auto; }
+.topbar .nav { justify-self: start; grid-column: auto; grid-row: auto; }
+@media (max-width: 600px) { .topbar { grid-template-columns: 1fr auto; } .topbar .nav { grid-column: auto; grid-row: auto; } }
+
+/* ---------- Guild axe badge on Saddle Up ---------- */
+.start .seal.axe-seal { width: 72px; height: 72px; padding: 0; overflow: hidden; background: #0b0808; border: 2px solid var(--gold); }
+.start .seal.axe-seal img { width: 100%; height: 100%; object-fit: cover; display: block; transform: scale(1.06); }
+@media (max-width: 600px) { .start .seal.axe-seal { width: 60px; height: 60px; } }
+
+/* ---------- Council layout ---------- */
+.council { gap: 18px; }
+.council-jump { display: flex; flex-wrap: wrap; gap: 6px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 6px); z-index: 5; padding: 8px; border: 1px solid var(--line); border-radius: 999px; background: rgba(20,14,14,.92); backdrop-filter: blur(6px); width: fit-content; max-width: 100%; }
+.council-jump a { font: 600 13px/1 var(--f-ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); text-decoration: none; padding: 8px 12px; border-radius: 999px; }
+.council-jump a:hover { color: var(--gold-hi); background: rgba(201,164,92,.08); }
+.c-sec { display: grid; gap: 14px; scroll-margin-top: 70px; }
+.c-sec .section-title { margin: 14px 0 0; }
+.c-grid { display: grid; gap: 14px; }
+.c-grid.two { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); }
+.c-grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.c-sec .hbar { grid-template-columns: 150px minmax(0,1fr) 40px; }
+.role-tiles { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
+.rtile { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 12px; align-items: center; padding: 14px; border: 1px solid var(--line); border-radius: var(--r); background: rgba(11,8,8,.45); }
+.rtile svg { grid-row: 1 / 3; width: 30px; height: 30px; color: var(--gold); }
+.rtile b { font: 700 30px/1 var(--f-ui); color: var(--bone); }
+.rtile span { font: 600 13px/1.3 var(--f-ui); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.rtile small { grid-column: 2; justify-self: end; margin-top: -26px; font: 600 13px/1 var(--f-ui); color: var(--gold); }
+.spec-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+.spec-card { border: 1px solid var(--line); border-top: 3px solid var(--cc); border-radius: var(--r); background: rgba(11,8,8,.45); padding: 10px 12px; }
+.sc-head { display: flex; align-items: center; gap: 8px; font: 700 15px/1 var(--f-ui); letter-spacing: .1em; text-transform: uppercase; color: var(--cc); padding-bottom: 8px; margin-bottom: 4px; border-bottom: 1px solid var(--line); }
+.sc-head .num { margin-left: auto; color: var(--bone); font-size: 18px; }
+.sc-row { display: grid; grid-template-columns: 1fr 28px 28px; align-items: center; gap: 6px; padding: 5px 0; font-size: 14px; color: var(--text); }
+.sc-row span small { display: block; font: 500 12px/1.2 var(--f-ui); letter-spacing: .05em; color: var(--muted); }
+.sc-row b { text-align: right; font: 700 16px/1 var(--f-ui); color: var(--bone); }
+.sc-row i { text-align: right; font: 600 14px/1 var(--f-ui); font-style: normal; color: var(--muted); }
+.sc-row.none { opacity: .5; }
+.prof-cols { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); column-gap: 28px; }
+@media (max-width: 900px) {
+  .c-grid.two, .c-grid.three, .prof-cols { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) { .c-sec .hbar { grid-template-columns: 110px minmax(0,1fr) 34px; } .council-jump { border-radius: 12px; } }
+.rtile { grid-template-columns: auto 1fr auto; }
+.rtile svg { grid-row: 1 / 3; }
+.rtile b { grid-column: 2; grid-row: 1; }
+.rtile span { grid-column: 2; grid-row: 2; }
+.rtile small { grid-column: 3; grid-row: 1 / 3; margin: 0; align-self: center; font-size: 15px; }
+.c-grid.three .hbar { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) 26px; font-size: 13px; letter-spacing: .04em; }

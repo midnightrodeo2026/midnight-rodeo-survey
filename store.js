@@ -68,7 +68,7 @@
   /* ---------------- 2. Supabase ---------------- */
   async function supabaseStore() {
     const cfg = C.supabase || {};
-    if (!cfg.url || !cfg.anonKey) return null;
+    if (!cfg.url || !cfg.anonKey || /PASTE/.test(cfg.anonKey)) return null;
     if (!window.supabase) {
       await new Promise((res, rej) => {
         const s = document.createElement("script");
