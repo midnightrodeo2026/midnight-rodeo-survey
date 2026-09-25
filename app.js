@@ -8,6 +8,7 @@
   const clsBy = k => C.classes.find(c => c.key === k);
   const specBy = (ck, sk) => { const c = clsBy(ck); return c ? c.specs.find(s => s.key === sk) : null; };
   const roleIcon = r => ({ "Tank": "i-tank", "Healer": "i-healer", "Melee DPS": "i-melee", "Ranged DPS": "i-ranged" }[r]);
+  const roleImg = r => `<img class="ri" src="role-${({ "Tank": "tank", "Healer": "healer", "Melee DPS": "melee", "Ranged DPS": "ranged" }[r])}.webp" alt="" aria-hidden="true">`;
   const labelOf = (list, k) => { const x = list.find(i => i.key === k); return x ? x.label : (k || ""); };
 
   let store = null, roster = [], responses = [], targets = null, mine = null, unsubResponses = null;
@@ -35,7 +36,7 @@
     if (!el) return;
     const bar = document.querySelector(".council-jump");
     const off = (bar ? bar.offsetHeight : 0) + 20;
-    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - off, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - off, behavior: "auto" });
   });
 
   function toast(msg) {
@@ -79,7 +80,7 @@
   }
   function buildStatic() {
     $("#main-cls").innerHTML = classes.map(c => tile("radio", "mainCls", c.key, `<span class="ico"><img class="ci" src="${c.key}.webp" alt="" aria-hidden="true" onerror="this.style.display='none'">${esc(c.name)}</span>`, "cls").replace('class="tile cls"', `class="tile cls" style="--cc:${c.color}"`)).join("");
-    $("#role-tiles").innerHTML = C.roles.map(r => tile("radio", "role", r, `<span class="ico"><svg aria-hidden="true"><use href="#${roleIcon(r)}"/></svg>${esc(r)}</span>`)).join("");
+    $("#role-tiles").innerHTML = C.roles.map(r => tile("radio", "role", r, `<span class="ico">${roleImg(r)}${esc(r)}</span>`)).join("");
     $("#commit-tiles").innerHTML = C.commitment.map(o => tile("radio", "commitment", o.key, `${esc(o.label)}<small>${esc(o.hint)}</small>`)).join("");
     $("#f-flexCls").innerHTML = `<option value="">No flex pick</option>` + classes.map(c => `<option value="${c.key}">${esc(c.name)}</option>`).join("");
     $("#offspec-tiles").innerHTML = C.offspec.map(o => tile("radio", "offspec", o.key, esc(o.label))).join("");
@@ -333,7 +334,7 @@
     const roleMax = Math.max(1, ...C.roles.map(r => byRole[r]));
     $("#role-cards").innerHTML = C.roles.map(r => {
       const have = byRole[r], pct = n ? Math.round(have / n * 100) : 0;
-      return `<div class="role-card"><div class="top"><svg aria-hidden="true"><use href="#${roleIcon(r)}"/></svg><span class="name">${r}</span><span class="count num">${have}</span></div>
+      return `<div class="role-card"><div class="top">${roleImg(r)}<span class="name">${r}</span><span class="count num">${have}</span></div>
         <div class="bar"><i style="width:${have / roleMax * 100}%"></i></div>
         <span class="status need">${n ? pct + "% of riders" : "No riders yet"}</span></div>`;
     }).join("");
@@ -401,7 +402,7 @@
     // roles as tiles
     $("#role-dist").innerHTML = C.roles.map(r => {
       const v = roleC[r] || 0, pct = n ? Math.round(v / n * 100) : 0;
-      return `<div class="rtile"><svg aria-hidden="true"><use href="#${roleIcon(r)}"/></svg><b class="num">${v}</b><span>${r}</span><small>${pct}%</small></div>`;
+      return `<div class="rtile">${roleImg(r)}<b class="num">${v}</b><span>${r}</span><small>${pct}%</small></div>`;
     }).join("");
 
     // class counts main + flex
