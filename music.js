@@ -42,7 +42,7 @@
   };
 
   // Intro page: the Enter click starts the music (browsers allow sound after a click)
-  // and plays the transition into the survey.
+  // and plays the transition onto the Board.
   if (intro) {
     const go = intro.querySelector("#intro-enter");
     go.focus({ preventScroll: true });
@@ -54,7 +54,7 @@
       intro.classList.add("leaving");
       document.documentElement.classList.remove("intro-open");
       document.documentElement.classList.add("intro-reveal");
-      if (!location.hash || location.hash === "#home") location.hash = "#survey";
+      window.scrollTo(0, 0);
       setTimeout(() => { intro.remove(); document.documentElement.classList.remove("intro-reveal"); }, reduce ? 300 : 1400);
     };
     go.addEventListener("click", enter);
