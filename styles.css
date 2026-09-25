@@ -519,3 +519,15 @@ img.ri { flex: none; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0
 .tile > span .ico img.ri { width: 38px; height: 38px; }
 .role-card img.ri { width: 48px; height: 48px; }
 .rtile img.ri { grid-row: 1 / 3; width: 54px; height: 54px; }
+
+/* One answer per rider: edit code */
+.edit-code-entry { margin-top: 18px; border: 1px dashed var(--line-hi); border-radius: var(--r); padding: 12px 14px; }
+.edit-code-entry summary { cursor: pointer; font: 600 14px/1.3 var(--f-ui); letter-spacing: .08em; text-transform: uppercase; color: var(--gold); }
+.edit-code-entry .help { margin-top: 8px; }
+.edit-code-entry .code-row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.edit-code-entry input { flex: 1 1 200px; min-width: 0; font-family: ui-monospace, Consolas, monospace; letter-spacing: .08em; text-transform: uppercase; }
+.edit-code-entry .error { color: var(--blood-hi); }
+.edit-code-box { width: min(560px, 100%); margin-top: 14px; padding: 14px 18px; border: 1px dashed var(--gold-dim); border-radius: 10px; display: grid; gap: 6px; text-align: center; }
+.edit-code-box span { font: 600 12px/1 var(--f-ui); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.edit-code-box b { font: 700 22px/1.2 ui-monospace, Consolas, monospace; letter-spacing: .12em; color: var(--gold-hi); overflow-wrap: anywhere; }
+.edit-code-box small { color: var(--muted); font-size: 13px; line-height: 1.4; }

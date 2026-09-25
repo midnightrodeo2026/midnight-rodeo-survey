@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Barlow+Condensed:wght@500;600;700&family=Grenze+Gotisch:wght@600;700;800&family=Metal+Mania&display=swap">
-<link rel="stylesheet" href="styles.css?v=8">
+<link rel="stylesheet" href="styles.css?v=9">
 </head>
 <body>
 <!-- Shared SVG icons -->
@@ -133,6 +133,16 @@
               <p class="error" id="e-discord" aria-live="polite"></p>
             </div>
           </div>
+          <details class="edit-code-entry" id="edit-code-entry">
+            <summary>Answered before on another device?</summary>
+            <p class="help">Each character can answer once. To change an answer you gave on a different phone or computer, enter the edit code from that answer's ticket, then submit with the same character name.</p>
+            <div class="code-row">
+              <label class="sr" for="f-edit-code">Edit code</label>
+              <input type="text" id="f-edit-code" maxlength="19" autocomplete="off" spellcheck="false" placeholder="ABCD-EFGH-JKLM-NPQR">
+              <button type="button" class="btn small" id="btn-use-code">Use code</button>
+            </div>
+            <p class="help" id="m-edit-code" aria-live="polite"></p>
+          </details>
         </section>
 
         <!-- 2 -->
@@ -248,6 +258,10 @@
       <h1 id="done-title" tabindex="-1">YOU'RE ON <span>THE BOARD.</span></h1>
       <p class="lede muted" style="max-width:52ch">Your answers are in the War Room. Nothing is locked in. If your plans change, come back and update them any time before launch.</p>
       <div class="ticket" id="ticket"></div>
+      <div class="edit-code-box" id="edit-code-box" hidden>
+        <span>Your edit code</span><b id="edit-code"></b>
+        <small>This browser remembers you, so you can update your answers here any time. Save this code if you want to update from a different device.</small>
+      </div>
       <div class="hero-cta" style="justify-content:center">
         <a class="btn primary" href="#home">See the board</a>
         <a class="btn ghost" href="#survey" id="btn-edit">Edit my answers</a>
@@ -321,10 +335,10 @@
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-<script src="config.js?v=8"></script>
-<script src="store.js?v=8"></script>
-<script src="app.js?v=8"></script>
-<script src="fx.js?v=8"></script>
-<script src="music.js?v=8"></script>
+<script src="config.js?v=9"></script>
+<script src="store.js?v=9"></script>
+<script src="app.js?v=9"></script>
+<script src="fx.js?v=9"></script>
+<script src="music.js?v=9"></script>
 </body>
 </html>

@@ -86,6 +86,14 @@
     }
     const poll = (fn, cb, ms) => { let alive = true; const run = async () => { if (!alive) return; try { cb(await fn()); } catch (e) {} setTimeout(run, ms); }; run(); return () => { alive = false; }; };
     const myKey = "mr-my-response";
+    const tokKey = "mr-edit-token";
+    const ALPHA = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    const getToken = () => {
+      let t = null; try { t = localStorage.getItem(tokKey); } catch (e) {}
+      if (!t) { t = Array.from(crypto.getRandomValues(new Uint8Array(16)), x => ALPHA[x % 32]).join(""); try { localStorage.setItem(tokKey, t); } catch (e) {} }
+      return t;
+    };
+    const friendly = msg => { const e = new Error(msg); e.friendly = true; return e; };
 
     return {
       mode: "supabase",
@@ -95,10 +103,24 @@
       async myResponse() {
         try { return JSON.parse(localStorage.getItem(myKey) || "null"); } catch (e) { return null; }
       },
+      editCode() { const t = getToken(); return t.match(/.{1,4}/g).join("-"); },
+      useEditCode(code) {
+        const t = String(code || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+        if (t.length !== 16) return false;
+        try { localStorage.setItem(tokKey, t); } catch (e) { return false; }
+        return true;
+      },
       async submit(r) {
         const row = { character: r.character, main_class: r.main.cls, main_spec: r.main.spec, role: r.role, payload: r };
-        const { error } = await sb.from("responses").insert(row);
-        if (error) throw new Error(error.message);
+        /* One answer per character. This browser keeps an edit code so the same rider can update later. */
+        const { error } = await sb.rpc("save_response", { p_token: getToken(), p_character: r.character, p_main_class: r.main.cls, p_main_spec: r.main.spec, p_role: r.role, p_payload: r });
+        if (error) {
+          if (/ALREADY_ANSWERED/.test(error.message || "")) throw friendly(`${r.character} has already answered from another device or browser. To update those answers here, enter the edit code from that answer's ticket in section 1 ("Answered before?"). If you're a different rider, use your own character name.`);
+          const missing = error.code === "PGRST202" || /could not find the function|does not exist/i.test(error.message || "");
+          if (!missing) throw new Error(error.message);
+          const { error: e2 } = await sb.from("responses").insert(row); /* database not upgraded yet */
+          if (e2) throw new Error(e2.message);
+        }
         try { localStorage.setItem(myKey, JSON.stringify(r)); } catch (e) {}
       },
       watchRoster(cb) {

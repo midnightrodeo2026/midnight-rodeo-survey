@@ -53,3 +53,59 @@ grant select on public.roster_public to anon, authenticated;
 
 -- Add your leadership emails:
 -- insert into public.leaders(email) values ('you@example.com');
+
+-- ------------------------------------------------------------------
+-- One answer per character, updatable from the same browser (edit code)
+-- ------------------------------------------------------------------
+alter table public.responses add column if not exists edit_token text;
+alter table public.responses add column if not exists updated_at timestamptz not null default now();
+
+-- Remove old duplicates: keep the newest answer for each character name.
+delete from public.responses r
+ using public.responses newer
+ where lower(r.character) = lower(newer.character)
+   and (r.created_at, r.id) < (newer.created_at, newer.id);
+
+create unique index if not exists responses_one_per_character on public.responses (lower(character));
+
+-- Everyone can read answers, but never the edit codes.
+revoke select on public.responses from anon, authenticated;
+grant select (id, created_at, updated_at, character, main_class, main_spec, role, payload) on public.responses to anon, authenticated;
+
+-- Answers are saved only through this function.
+drop policy if exists "anyone can submit" on public.responses;
+
+create or replace function public.save_response(
+  p_token text, p_character text, p_main_class text, p_main_spec text, p_role text, p_payload jsonb
+) returns uuid
+language plpgsql security definer set search_path = public as $$
+declare v_id uuid; v_tok text; v_name text := trim(p_character);
+begin
+  if coalesce(length(p_token), 0) < 16 then raise exception 'Missing edit code'; end if;
+  if char_length(v_name) < 2 then raise exception 'Character name is required'; end if;
+
+  select id, edit_token into v_id, v_tok from responses where lower(character) = lower(v_name);
+
+  if v_id is not null and v_tok is not null and v_tok <> p_token then
+    raise exception 'ALREADY_ANSWERED';
+  end if;
+
+  if v_id is null then
+    -- Same browser renamed its character: update that answer instead of adding a second one.
+    select id into v_id from responses where edit_token = p_token;
+  end if;
+
+  if v_id is null then
+    insert into responses (character, main_class, main_spec, role, payload, edit_token)
+    values (v_name, p_main_class, p_main_spec, p_role, p_payload, p_token)
+    returning id into v_id;
+  else
+    update responses
+       set character = v_name, main_class = p_main_class, main_spec = p_main_spec,
+           role = p_role, payload = p_payload, edit_token = coalesce(edit_token, p_token), updated_at = now()
+     where id = v_id;
+  end if;
+  return v_id;
+end $$;
+
+grant execute on function public.save_response(text, text, text, text, text, jsonb) to anon, authenticated;

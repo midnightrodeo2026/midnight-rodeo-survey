@@ -306,7 +306,7 @@
       state.visited = 6;
       location.hash = "#done";
     } catch (e) {
-      $("#e-submit").textContent = "Your answers didn't save: " + (e && e.message ? e.message : "connection problem") + ". Check your connection and press the button again.";
+      $("#e-submit").textContent = e && e.friendly ? e.message : "Your answers didn't save: " + (e && e.message ? e.message : "connection problem") + ". Check your connection and press the button again.";
     } finally { btn.disabled = false; showStepLabel(); }
   }
   function showStepLabel() { if (state.step === 6) $("#btn-next").textContent = mine ? "Update my answers" : "Put me on the board"; }
@@ -317,7 +317,15 @@
       ["Flex", r.flex && r.flex.cls ? specName(r.flex.cls, r.flex.spec) : "None"], ["Roster", labelOf(C.rosterPrefs, r.roster)],
       ["Days", (r.days || []).join(" ")]
     ].map((x, i) => `<div class="row"><span>${x[0]}</span><b${i === 1 && c ? ` style="color:${c.color}"` : ""}>${esc(x[1])}</b></div>`).join("");
+    const code = store && store.editCode ? store.editCode() : "";
+    $("#edit-code-box").hidden = !code;
+    if (code) $("#edit-code").textContent = code;
   }
+  $("#btn-use-code").addEventListener("click", () => {
+    const ok = store && store.useEditCode && store.useEditCode($("#f-edit-code").value);
+    $("#m-edit-code").textContent = ok ? "Code saved. Put in the same character name and submit to update that answer." : "That code doesn't look right. It has 16 letters and numbers, like ABCD-EFGH-JKLM-NPQR.";
+    $("#m-edit-code").classList.toggle("error", !ok);
+  });
 
   /* ------------------------------------------------------------------ */
   /* HOME — the board                                                    */
