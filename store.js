@@ -110,7 +110,10 @@
       watchResponses(cb) {
         return poll(async () => {
           const { data } = await sb.from("responses").select("id,payload,created_at").order("created_at", { ascending: false });
-          return (data || []).map(x => Object.assign({ id: x.id }, x.payload));
+          if (data && data.length) return data.map(x => Object.assign({ id: x.id }, x.payload));
+          /* Full answers not readable (database policy): fall back to the public roster so the War Room still fills in. */
+          const { data: pub } = await sb.from("roster_public").select("*").order("created_at", { ascending: false }).limit(500);
+          return (pub || []).map(x => ({ id: x.id, character: x.character, discord: "", main: { cls: x.main_class, spec: x.main_spec }, role: x.role, commitment: "", flex: { cls: "", spec: "", role: "" }, offspec: "", interests: [], roster: "", tz: "", days: [], start: "", end: "", professions: [], profChange: "", notes: "", submittedAt: x.created_at }));
         }, cb, 30000);
       },
       watchTargets(cb) {

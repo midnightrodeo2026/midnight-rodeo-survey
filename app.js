@@ -26,6 +26,17 @@
     window.scrollTo(0, 0);
   }
   window.addEventListener("hashchange", route);
+  /* War Room section menu: scroll to the section instead of changing the page */
+  document.addEventListener("click", e => {
+    const a = e.target.closest(".council-jump a[href^='#']");
+    if (!a) return;
+    e.preventDefault();
+    const el = document.getElementById(a.getAttribute("href").slice(1));
+    if (!el) return;
+    const bar = document.querySelector(".council-jump");
+    const off = (bar ? bar.offsetHeight : 0) + 20;
+    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - off, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  });
 
   function toast(msg) {
     const t = $("#toast"); t.textContent = msg; t.hidden = false;
@@ -348,7 +359,7 @@
   /* ------------------------------------------------------------------ */
   function enterCouncil() {
     if (!store) return;
-    const lead = !!store.canLead, showLogin = !lead && store.mode === "supabase";
+    const lead = !!store.canLead, showLogin = false; /* War Room is open to everyone, no sign-in */
     const locked = !store.canView && !lead;
     $("#council-locked").hidden = !(locked || loginOpen); $("#council-body").hidden = locked;
     $("#login-form").hidden = !showLogin;
