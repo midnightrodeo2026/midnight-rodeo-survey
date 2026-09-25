@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Midnight Rodeo Roster Survey</title>
+<meta name="description" content="Pre-launch roster survey for the Horde guild Midnight Rodeo in WoW Forever.">
+<meta name="theme-color" content="#0b0808">
+<link rel="icon" href="logo-sm.webp" type="image/webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Barlow+Condensed:wght@500;600;700&family=Grenze+Gotisch:wght@600;700;800&family=Metal+Mania&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<!-- Shared SVG icons -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-skull" viewBox="0 0 48 48">
+    <path d="M17 17C11 18 5 15 3 7c3 5 7 6 12 5" fill="none" stroke="#efe4d0" stroke-width="2.6" stroke-linecap="round"/>
+    <path d="M31 17c6 1 12-2 14-10-3 5-7 6-12 5" fill="none" stroke="#efe4d0" stroke-width="2.6" stroke-linecap="round"/>
+    <path d="M15 14h18l-2 13-3 12h-8l-3-12z" fill="#efe4d0"/>
+    <path d="M18 22l5 2-1 3-4-1zM30 22l-5 2 1 3 4-1z" fill="#3a0a0d"/>
+    <path d="M24 15l3 4-3 3-3-3z" fill="#a3141c"/>
+    <path d="M21 35h1.6v3H21zM25.4 35H27v3h-1.6z" fill="#3a0a0d"/>
+  </symbol>
+  <symbol id="i-tank" viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.4 9.3-8 11-4.6-1.7-8-6-8-11V5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 6v12M8 10h8" stroke="currentColor" stroke-width="1.6"/></symbol>
+  <symbol id="i-healer" viewBox="0 0 24 24"><path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-melee" viewBox="0 0 24 24"><path d="M4 4l10 10M20 4L10 14M3 17l4 4M21 17l-4 4M6 15l3 3M18 15l-3 3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-ranged" viewBox="0 0 24 24"><path d="M5 3c8 2 14 8 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M5 3L21 19M3 21L14 10M3 21v-4M3 21h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+</svg>
+
+<div class="wrap">
+  <header class="topbar">
+    <a class="brand" href="#home" aria-label="Midnight Rodeo home">
+      <img src="logo-sm.webp" alt="" width="38" height="38">
+      <span><b>Midnight Rodeo</b><small>WoW Forever · Horde</small></span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a href="#home" data-nav="home">The Board</a>
+      <a href="#survey" data-nav="survey">Survey</a>
+      <a href="#council" data-nav="council" id="nav-council" hidden>Council</a>
+    </nav>
+    <span class="mode-pill" id="mode-pill">Connecting…</span>
+  </header>
+
+  <!-- ================= HOME ================= -->
+  <main id="view-home" data-view="home">
+    <section class="hero">
+      <div class="hero-logo"><img src="logo.webp" alt="Midnight Rodeo guild crest: a Horde-marked bull skull under a blood moon" width="640" height="640"></div>
+      <div>
+        <p class="eyebrow">Horde guild · WoW Forever</p>
+        <h1>Midnight <span>Rodeo</span></h1>
+        <p class="sub">Pre-Launch Roster Survey</p>
+        <p class="lede">Tell leadership what you plan to ride at launch. Your answers help us balance tanks, healers and damage across the raid team before day one. <strong>Nothing here locks you in.</strong> You can change your answers any time, and nobody gets forced onto a class.</p>
+        <div class="hero-cta">
+          <a class="start" href="#survey" id="start-btn">
+            <span class="seal" aria-hidden="true"><svg><use href="#i-skull"/></svg></span>
+            <span><b id="start-label">Saddle Up</b><small id="start-sub">Start the survey · about 4 minutes</small></span>
+          </a>
+          <p class="me-note" id="me-note" hidden></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="board" aria-labelledby="board-title">
+      <div class="board-head">
+        <div>
+          <p class="eyebrow">How the survey is going</p>
+          <h2 id="board-title">The Roster Board</h2>
+        </div>
+        <span class="live"><i></i> <span id="live-text">Live count</span></span>
+      </div>
+      <div class="tally">
+        <div class="ring" role="img" id="ring" aria-label="Responses toward roster goal">
+          <svg viewBox="0 0 120 120" aria-hidden="true">
+            <circle cx="60" cy="60" r="52" fill="none" stroke="#2b2020" stroke-width="10"/>
+            <circle id="ring-arc" cx="60" cy="60" r="52" fill="none" stroke="url(#rg)" stroke-width="10" stroke-linecap="round" stroke-dasharray="0 400"/>
+            <defs><linearGradient id="rg" x1="0" x2="1"><stop offset="0" stop-color="#a3141c"/><stop offset="1" stop-color="#ecd092"/></linearGradient></defs>
+          </svg>
+          <div class="c"><b class="num" id="ring-count">0</b><span id="ring-goal">of 40 riders</span></div>
+        </div>
+        <div class="roles" id="role-cards"></div>
+      </div>
+
+      <div class="section-title"><h3>Classes on the board</h3></div>
+      <div class="classes" id="class-chips"></div>
+
+      <div class="section-title"><h3>Latest riders</h3></div>
+      <ul class="riders" id="riders"></ul>
+
+      <div class="how">
+        <div><b>Fill it out once</b><p>Main, flex pick, schedule and professions. Takes a few minutes.</p></div>
+        <div><b>Leadership balances</b><p>The council sees class, role and schedule gaps and plans the launch roster around them.</p></div>
+        <div><b>Change your mind</b><p>Come back and resubmit whenever your plans change. Your latest answer counts.</p></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= SURVEY ================= -->
+  <main id="view-survey" data-view="survey" hidden>
+    <div class="survey">
+      <aside class="steps" aria-label="Survey sections">
+        <div class="prog">
+          <div class="lbl"><span>Progress</span><span class="num" id="prog-pct">0%</span></div>
+          <div class="bar" role="progressbar" aria-label="Survey completion" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="prog-bar"><i style="width:0%"></i></div>
+        </div>
+        <ol id="step-list"></ol>
+      </aside>
+
+      <form id="survey-form" class="card" novalidate>
+        <!-- 1 -->
+        <section data-step="0" aria-labelledby="s0h">
+          <div class="card-head"><p class="eyebrow">Section 1 of 7</p><h2 id="s0h">Who's riding?</h2><p>So leadership can match your answers to you in game and on Discord.</p></div>
+          <div class="fields grid2">
+            <div class="field">
+              <label for="f-character">Character / main name<span class="req" aria-hidden="true">*</span></label>
+              <input type="text" id="f-character" name="character" maxlength="24" autocomplete="off" placeholder="e.g. Grimtusk" aria-describedby="e-character h-character" required>
+              <p class="help" id="h-character">The name you plan to use at launch. If you're not sure yet, put your usual main name.</p>
+              <p class="error" id="e-character" aria-live="polite"></p>
+            </div>
+            <div class="field">
+              <label for="f-discord">Discord name<span class="req" aria-hidden="true">*</span></label>
+              <input type="text" id="f-discord" name="discord" maxlength="40" autocomplete="off" placeholder="e.g. grimtusk" aria-describedby="e-discord" required>
+              <p class="error" id="e-discord" aria-live="polite"></p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2 -->
+        <section data-step="1" aria-labelledby="s1h" hidden>
+          <div class="card-head"><p class="eyebrow">Section 2 of 7</p><h2 id="s1h">Your main</h2><p>What you want to play at launch.</p></div>
+          <div class="fields">
+            <fieldset class="field"><legend>Primary class<span class="req" aria-hidden="true">*</span></legend>
+              <div class="tiles" id="main-cls"></div><p class="error" id="e-mainCls" aria-live="polite"></p></fieldset>
+            <fieldset class="field"><legend>Primary spec<span class="req" aria-hidden="true">*</span></legend>
+              <div class="tiles" id="main-spec"><p class="help">Pick a class first.</p></div><p class="error" id="e-mainSpec" aria-live="polite"></p></fieldset>
+            <fieldset class="field"><legend>Preferred role<span class="req" aria-hidden="true">*</span></legend>
+              <div class="tiles" id="role-tiles"></div><p class="help" id="role-help">Roles your spec can't fill are greyed out.</p><p class="error" id="e-role" aria-live="polite"></p></fieldset>
+            <fieldset class="field"><legend>How committed are you to this choice?<span class="req" aria-hidden="true">*</span></legend>
+              <div class="tiles wide" id="commit-tiles"></div><p class="error" id="e-commitment" aria-live="polite"></p></fieldset>
+          </div>
+        </section>
+
+        <!-- 3 -->
+        <section data-step="2" aria-labelledby="s2h" hidden>
+          <div class="card-head"><p class="eyebrow">Section 3 of 7</p><h2 id="s2h">Flex pick</h2><p>An alternative class you'd be willing to play if the roster needs it. Optional, but it helps a lot.</p></div>
+          <div class="fields">
+            <div class="field">
+              <label for="f-flexCls">Alternative / flex class</label>
+              <select id="f-flexCls" name="flexCls"></select>
+            </div>
+            <fieldset class="field" id="flex-spec-field" hidden><legend>Flex spec<span class="req" aria-hidden="true">*</span></legend>
+              <div class="tiles" id="flex-spec"></div><p class="error" id="e-flexSpec" aria-live="polite"></p></fieldset>
+            <fieldset class="field"><legend>Would you keep a raid-ready off-spec?<span class="req" aria-hidden="true">*</span></legend>
+              <p class="help">An off-spec on your main (for example, a Warrior keeping a tank set).</p>
+              <div class="tiles wide" id="offspec-tiles"></div><p class="error" id="e-offspec" aria-live="polite"></p></fieldset>
+          </div>
+        </section>
+
+        <!-- 4 -->
+        <section data-step="3" aria-labelledby="s3h" hidden>
+          <div class="card-head"><p class="eyebrow">Section 4 of 7</p><h2 id="s3h">How you play</h2><p>What you're into and where you see yourself on the roster.</p></div>
+          <div class="fields">
+            <fieldset class="field"><legend>Interests<span class="req" aria-hidden="true">*</span></legend>
+              <p class="help">Pick everything that applies.</p>
+              <div class="tiles wide" id="interest-tiles"></div><p class="error" id="e-interests" aria-live="polite"></p></fieldset>
+            <fieldset class="field"><legend>Roster preference<span class="req" aria-hidden="true">*</span></legend>
+              <div class="tiles wide" id="roster-tiles"></div><p class="error" id="e-roster" aria-live="polite"></p></fieldset>
+          </div>
+        </section>
+
+        <!-- 5 -->
+        <section data-step="4" aria-labelledby="s4h" hidden>
+          <div class="card-head"><p class="eyebrow">Section 5 of 7</p><h2 id="s4h">When you ride</h2><p>Your usual play window in your own timezone. Leadership converts everything to server time.</p></div>
+          <div class="fields">
+            <div class="field">
+              <label for="f-tz">Your timezone<span class="req" aria-hidden="true">*</span></label>
+              <select id="f-tz" name="tz" aria-describedby="e-tz"></select>
+              <p class="error" id="e-tz" aria-live="polite"></p>
+            </div>
+            <fieldset class="field"><legend>Available days<span class="req" aria-hidden="true">*</span></legend>
+              <div class="tiles days" id="day-tiles"></div><p class="error" id="e-days" aria-live="polite"></p></fieldset>
+            <div class="grid2">
+              <div class="field">
+                <label for="f-start">Typical start time<span class="req" aria-hidden="true">*</span></label>
+                <input type="time" id="f-start" name="start" step="900" aria-describedby="e-start">
+                <p class="error" id="e-start" aria-live="polite"></p>
+              </div>
+              <div class="field">
+                <label for="f-end">Typical end time<span class="req" aria-hidden="true">*</span></label>
+                <input type="time" id="f-end" name="end" step="900" aria-describedby="e-end h-end">
+                <p class="help" id="h-end">Past midnight is fine (e.g. 19:00 to 01:00).</p>
+                <p class="error" id="e-end" aria-live="polite"></p>
+              </div>
+            </div>
+            <p class="inline-note" id="tz-note" hidden></p>
+          </div>
+        </section>
+
+        <!-- 6 -->
+        <section data-step="5" aria-labelledby="s5h" hidden>
+          <div class="card-head"><p class="eyebrow">Section 6 of 7</p><h2 id="s5h">Professions & notes</h2><p>So we can cover flasks, enchants, gear crafts and the guild bank.</p></div>
+          <div class="fields">
+            <div class="grid2">
+              <div class="field">
+                <label for="f-prof1">Planned profession 1<span class="req" aria-hidden="true">*</span></label>
+                <select id="f-prof1" name="prof1" aria-describedby="e-prof1"></select>
+                <p class="error" id="e-prof1" aria-live="polite"></p>
+              </div>
+              <div class="field">
+                <label for="f-prof2">Planned profession 2<span class="req" aria-hidden="true">*</span></label>
+                <select id="f-prof2" name="prof2" aria-describedby="e-prof2"></select>
+                <p class="error" id="e-prof2" aria-live="polite"></p>
+              </div>
+            </div>
+            <fieldset class="field"><legend>Would you change professions for guild needs?<span class="req" aria-hidden="true">*</span></legend>
+              <div class="tiles wide" id="profchange-tiles"></div><p class="error" id="e-profChange" aria-live="polite"></p></fieldset>
+            <div class="field">
+              <label for="f-notes">Notes for leadership</label>
+              <textarea id="f-notes" name="notes" maxlength="600" placeholder="Anything else: alts, schedule changes, friends joining, who you want to raid with…" aria-describedby="notes-count"></textarea>
+              <p class="counter" id="notes-count">0 / 600</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 7 -->
+        <section data-step="6" aria-labelledby="s6h" hidden>
+          <div class="card-head"><p class="eyebrow">Section 7 of 7</p><h2 id="s6h">Check your brand</h2><p>Look it over, then put yourself on the board.</p></div>
+          <div class="review" id="review"></div>
+          <p class="error" id="e-submit" aria-live="assertive" style="margin-top:14px"></p>
+        </section>
+
+        <div class="actions">
+          <button type="button" class="btn ghost" id="btn-back">Back</button>
+          <button type="button" class="btn primary" id="btn-next">Next</button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <!-- ================= CONFIRMATION ================= -->
+  <main id="view-done" data-view="done" hidden>
+    <section class="done" aria-labelledby="done-title">
+      <div class="stamp"><img src="logo.webp" alt="" width="640" height="640"></div>
+      <h1 id="done-title" tabindex="-1">YOU'RE ON <span>THE BOARD.</span></h1>
+      <p class="lede muted" style="max-width:52ch">Leadership has your answers. Nothing is locked in. If your plans change, come back and update them any time before launch.</p>
+      <div class="ticket" id="ticket"></div>
+      <div class="hero-cta" style="justify-content:center">
+        <a class="btn primary" href="#home">See the board</a>
+        <a class="btn ghost" href="#survey" id="btn-edit">Edit my answers</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= COUNCIL ================= -->
+  <main id="view-council" data-view="council" hidden>
+    <div id="council-locked" class="locked" hidden>
+      <p class="eyebrow">Leadership only</p>
+      <h1>The Council</h1>
+      <p class="muted" id="locked-text">Only guild leadership can see full responses.</p>
+      <form id="login-form" class="toolbar" hidden>
+        <label class="sr" for="login-email">Leadership email</label>
+        <input type="text" id="login-email" inputmode="email" placeholder="you@example.com">
+        <button class="btn primary small" type="submit">Email me a sign-in link</button>
+      </form>
+    </div>
+    <div id="council-body" class="council" hidden>
+      <div class="council-head">
+        <div><p class="eyebrow">Leadership only</p><h1>The Council</h1></div>
+        <div class="toolbar">
+          <button class="btn small" id="btn-csv" type="button">Export CSV</button>
+          <button class="btn small ghost" id="btn-reset-demo" type="button" hidden>Reset demo data</button>
+        </div>
+      </div>
+      <div class="kpis" id="kpis"></div>
+      <div class="panels">
+        <div class="panel span2"><h3>Roster gaps</h3><div class="gaps" id="gaps"></div></div>
+        <div class="panel"><h3>Role distribution <span class="legend"><span><i style="background:#d42a2f"></i>Main</span><span><i style="background:#8d7240"></i>Target</span></span></h3><div id="role-dist"></div></div>
+        <div class="panel"><h3>Class counts <span class="legend"><span><i style="background:#d42a2f"></i>Main</span><span><i style="background:#5a4234"></i>Flex</span></span></h3><div id="class-dist"></div></div>
+        <div class="panel"><h3>Spec counts</h3><div class="scroll"><table id="spec-table"></table></div></div>
+        <div class="panel"><h3>Professions <span class="legend" id="prof-legend"></span></h3><div id="prof-dist"></div></div>
+        <div class="panel span2"><h3>Availability <label class="legend" for="ref-tz">Shown in <select id="ref-tz" style="min-height:34px;width:auto;padding:4px 36px 4px 10px;font-size:14px"></select></label></h3><div class="scroll"><div class="heat" id="heat"></div></div><p class="help" style="margin-top:10px">Darker red = more riders online in that hour. Hover a cell for the exact count.</p></div>
+        <div class="panel"><h3>Roster preference</h3><div id="roster-dist"></div></div>
+        <div class="panel"><h3>Interests</h3><div id="interest-dist"></div></div>
+        <div class="panel"><h3>Commitment</h3><div id="commit-dist"></div></div>
+        <div class="panel"><h3>Launch targets</h3>
+          <form class="targets-form" id="targets-form">
+            <label>Roster goal<input type="text" inputmode="numeric" id="t-goal"></label>
+            <label>Tanks<input type="text" inputmode="numeric" id="t-Tank"></label>
+            <label>Healers<input type="text" inputmode="numeric" id="t-Healer"></label>
+            <label>Melee<input type="text" inputmode="numeric" id="t-Melee DPS"></label>
+            <label>Ranged<input type="text" inputmode="numeric" id="t-Ranged DPS"></label>
+          </form>
+          <div class="toolbar" style="margin-top:12px"><button class="btn small primary" type="button" id="btn-targets">Save targets</button><span class="help">Targets drive the board and the gap list.</span></div>
+        </div>
+        <div class="panel span2"><h3>All responses <span class="toolbar"><label class="sr" for="resp-search">Search responses</label><input type="text" id="resp-search" placeholder="Search name, class, Discord…"></span></h3>
+          <div class="scroll" style="max-height:520px"><table id="resp-table"></table></div></div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot"><span>Midnight Rodeo · For the Horde</span><span>Pre-launch roster survey</span></footer>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="config.js"></script>
+<script src="store.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
